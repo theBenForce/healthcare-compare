@@ -3,7 +3,7 @@ import { DBRoot } from '../types/db.dto';
 
 interface DBContextInterface {
   db: DBRoot;
-  setDB: React.Dispatch<React.SetStateAction<DBRoot>>;
+  saveDb: (db: DBRoot) => void;
 }
 
 export const DBContext = React.createContext<DBContextInterface>({
@@ -12,7 +12,7 @@ export const DBContext = React.createContext<DBContextInterface>({
     people: [],
     categories: [],
   },
-  setDB: () => { },
+  saveDb: () => { },
 });
 
 
@@ -32,8 +32,13 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
+  const saveDb = (db: DBRoot) => {
+    localStorage.setItem('db', JSON.stringify(db));
+    setDB(db);
+  };
+
   return (
-    <DBContext.Provider value={{ db, setDB }}>
+    <DBContext.Provider value={{ db, saveDb }}>
       {children}
     </DBContext.Provider>
   );

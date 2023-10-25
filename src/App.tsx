@@ -18,10 +18,13 @@ import { SummaryPage } from './pages/summary';
 import { Sidebar } from './components/Sidebar';
 import { PlanListPage } from './pages/planList';
 import { WithPlans } from './providers/plans';
+import { useAppContext } from './providers/state';
+import { EditPlanPage } from './pages/editPlan';
 
 
 function App() {
   const [isDrawerOpen, setDrawerOpen] = React.useState(false);
+  const { title } = useAppContext();
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw' }}>
@@ -36,7 +39,7 @@ function App() {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'left' }}>Healthcare Compare</Typography>
+            <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'left' }}>{title}</Typography>
           </Toolbar>
         </AppBar>
 
@@ -51,6 +54,7 @@ function App() {
 
             <Route path='plan'>
               <Route path='/plan' element={<WithPlans><PlanListPage /></WithPlans>} />
+              <Route path="/plan/:planId" element={<WithPlans><EditPlanPage /></WithPlans>} />
             </Route>
           </Routes>
         </Container>
