@@ -17,11 +17,12 @@ import Container from '@mui/material/Container';
 import { SummaryPage } from './pages/summary';
 import { Sidebar } from './components/Sidebar';
 import { PlanListPage } from './pages/planList';
-import { WithPlans } from './providers/plans';
 import { useAppContext } from './providers/state';
 import { EditPlanPage } from './pages/planEdit';
 import { PeopleListPage } from './pages/personList';
 import { EditPersonPage } from './pages/personEdit';
+import { CategoryListPage } from './pages/categoryList';
+import { EditCategoryPage } from './pages/categoryEdit';
 
 
 function App() {
@@ -62,6 +63,11 @@ function App() {
             <Route path='person'>
               <Route path='/person' element={<PeopleListPage />} />
               <Route path="/person/:personId" element={<EditPersonPage />} />
+            </Route>
+
+            <Route path='category'>
+              <Route path='/category' element={<CategoryListPage />} />
+              <Route path="/category/:id" element={<EditCategoryPage />} />
             </Route>
           </Routes>
         </Container>

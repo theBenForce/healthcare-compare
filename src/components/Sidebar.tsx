@@ -1,6 +1,7 @@
 import PeopleIcon from '@mui/icons-material/PeopleRounded';
 import HomeIcon from '@mui/icons-material/HomeRounded';
 import PlansIcon from '@mui/icons-material/MedicationRounded';
+import CategoryIcon from '@mui/icons-material/CategoryRounded';
 
 import { Drawer, MenuList, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import React from 'react';
@@ -38,6 +39,11 @@ const menuItems: Array<RootMenuRecord> = [
     path: '/person',
     name: 'People',
     icon: <PeopleIcon />,
+  },
+  {
+    path: '/category',
+    name: 'Categories',
+    icon: <CategoryIcon />,
   }
 ];
 
