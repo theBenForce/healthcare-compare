@@ -4,33 +4,36 @@ import { useDB } from "./db";
 import { ulid } from "ulidx";
 
 interface PlansContextInterface {
+  list: () => Promise<PlanSchema[]>;
+  create: () => Promise<string>;
+  get: (planId: string) => Promise<PlanSchema | null>;
+  save: (plan: PlanSchema) => Promise<void>;
+  remove: (planId: string) => Promise<void>;
   plans: PlanSchema[];
-  create: () => string;
-  get: (planId: string) => PlanSchema | null;
-  save: (plan: PlanSchema) => void;
-  remove: (planId: string) => void;
 }
 
 const PlansContext = React.createContext<PlansContextInterface>({
+  list: async () => [],
+  create: async () => '',
+  get: async () => null,
+  save: async () => { },
+  remove: async () => { },
   plans: [],
-  create: () => '',
-  get: () => null,
-  save: () => { },
-  remove: () => { },
 });
 
 export const usePlans = () => React.useContext(PlansContext);
 
 export const WithPlans = ({ children }: { children: React.ReactNode }) => {
+  const { db } = useDB();
   const [plans, setPlans] = React.useState<PlanSchema[]>([]);
-  const { db, saveDb } = useDB();
 
-  const savePlans = (plans: PlanSchema[]) => {
-    setPlans(plans);
-    saveDb({ ...db, plans });
-  };
+  const list = React.useCallback(async () => {
+    const result = (await db?.getAll('plans')) ?? [];
+    setPlans(result);
+    return result as Array<PlanSchema>;
+  }, [db]);
 
-  const create = () => {
+  const create = async () => {
     const planId = ulid();
 
     const newPlan = {
@@ -40,37 +43,34 @@ export const WithPlans = ({ children }: { children: React.ReactNode }) => {
       premium: 0,
       discount: 0,
       coverages: [],
+      isFamilyPlan: false,
+      outOfPocketMax: 0,
+      familyOutOfPocketMax: 0,
+      deductible: 0,
+      familyDeductible: 0,
     } as PlanSchema;
 
-    savePlans([...plans, newPlan]);
+    await db?.add('plans', newPlan);
+
+    await list();
 
     return planId;
   };
 
-  const remove = (planId: string) => {
-    const planIndex = plans.findIndex((plan) => plan.id === planId);
-    if (planIndex === -1) return;
-    plans.splice(planIndex, 1);
-    savePlans([...plans]);
-  };
+  const remove = React.useCallback(async (planId: string) => {
+    await db?.delete('plans', planId);
+    await list();
+  }, [db, list]);
 
-  const get = (planId: string) => plans.find((plan) => plan.id === planId) || null;
-  const save = (plan: PlanSchema) => {
-    const planIndex = plans.findIndex((p) => p.id === plan.id);
-    if (planIndex === -1) {
-      plans.push(plan);
-    } else {
-      plans[planIndex] = plan;
-    }
-    savePlans([...plans]);
-  }
+  const get = React.useCallback(async (planId: string) => db?.get('plans', planId), [db]);
+  const save = React.useCallback(async (plan: PlanSchema) => { await db?.put('plans', plan); await list(); }, [db, list]);
 
   React.useEffect(() => {
-    setPlans(db.plans);
-  }, [db]);
+    list();
+  }, [list]);
 
   return (
-    <PlansContext.Provider value={{ plans, create, get, save, remove }}>
+    <PlansContext.Provider value={{ list, create, get, save, remove, plans }}>
       {children}
     </PlansContext.Provider>
   );

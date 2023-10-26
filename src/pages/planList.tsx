@@ -20,8 +20,8 @@ export const PlanListPage: React.FC = () => {
     setTitle('Plans');
   }, [setTitle]);
 
-  const onCreatePlan = () => {
-    const planId = createPlan();
+  const onCreatePlan = async () => {
+    const planId = await createPlan();
     navigate(`/plan/${planId}`);
   };
 

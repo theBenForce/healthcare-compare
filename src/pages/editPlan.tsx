@@ -5,7 +5,7 @@ import { useAppContext } from "../providers/state";
 import { usePlans } from "../providers/plans";
 import { useParams } from "react-router-dom";
 import SaveIcon from "@mui/icons-material/SaveRounded";
-import { Fab, FormControlLabel, Stack, Switch, TextField, Typography, useTheme } from "@mui/material";
+import { Fab, FormControlLabel, LinearProgress, Stack, Switch, TextField, Typography, useTheme } from "@mui/material";
 
 export const EditPlanPage: React.FC = () => {
   const { setTitle } = useAppContext();
@@ -20,14 +20,20 @@ export const EditPlanPage: React.FC = () => {
 
   React.useEffect(() => {
     if (!planId) return;
-
-    const plan = getPlan(planId);
-    setPlan(plan);
+    getPlan(planId)
+      .then(plan => setPlan(plan));
   }, [planId, getPlan]);
 
   const onSave = () => {
     savePlan(plan!);
   };
+
+  if (!plan) {
+    return <Stack spacing={2}>
+      <Typography variant="h6">Loading...</Typography>
+      <LinearProgress />
+    </Stack>;
+  }
 
   return <Stack spacing={2}>
     <TextField fullWidth label="Name" value={plan?.name} onChange={(event) => setPlan(plan => ({ ...plan, name: event.target.value }))} />
