@@ -4,13 +4,16 @@ import App from './App.tsx'
 import { WithDB } from './providers/db.tsx'
 import CssBaseline from '@mui/material/CssBaseline';
 import { WithAppContext } from './providers/state.tsx';
+import { WithPlans } from './providers/plans.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <WithAppContext>
       <CssBaseline>
         <WithDB>
-          <App />
+          <WithPlans>
+            <App />
+          </WithPlans>
         </WithDB>
       </CssBaseline>
     </WithAppContext>

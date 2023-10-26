@@ -1,44 +1,44 @@
 import React from 'react';
-import { DBRoot } from '../types/db.dto';
+import { IDBPDatabase, openDB } from 'idb';
 
 interface DBContextInterface {
-  db: DBRoot;
-  saveDb: (db: DBRoot) => void;
+  db: IDBPDatabase | null;
 }
 
 export const DBContext = React.createContext<DBContextInterface>({
-  db: {
-    plans: [],
-    people: [],
-    categories: [],
-  },
-  saveDb: () => { },
+  db: null
 });
 
 
 export const useDB = () => React.useContext(DBContext);
 
 export const WithDB = ({ children }: { children: React.ReactNode }) => {
-  const [db, setDB] = React.useState<DBRoot>({
-    plans: [],
-    people: [],
-    categories: [],
-  });
+  const [db, setDB] = React.useState<IDBPDatabase | null>(null);
 
   React.useEffect(() => {
-    const dbString = localStorage.getItem('db');
-    if (dbString) {
-      setDB(JSON.parse(dbString));
-    }
+    console.info(`Initializing DB`);
+    openDB('healthcare-compare', 1, {
+      upgrade(database) {
+        console.info(`Upgrading DB`)
+        if (!database.objectStoreNames.contains('plans')) {
+          database.createObjectStore('plans', { keyPath: 'id' });
+        }
+
+        if (!database.objectStoreNames.contains('people')) {
+          database.createObjectStore('people', { keyPath: 'id' });
+        }
+
+        if (!database.objectStoreNames.contains('categories')) {
+          database.createObjectStore('categories', { keyPath: 'id' });
+        }
+      },
+    }).then((db) => {
+      setDB(db);
+    });
   }, []);
 
-  const saveDb = (db: DBRoot) => {
-    localStorage.setItem('db', JSON.stringify(db));
-    setDB(db);
-  };
-
   return (
-    <DBContext.Provider value={{ db, saveDb }}>
+    <DBContext.Provider value={{ db }}>
       {children}
     </DBContext.Provider>
   );

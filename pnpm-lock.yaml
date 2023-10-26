@@ -17,6 +17,9 @@ dependencies:
   '@mui/material':
     specifier: ^5.14.15
     version: 5.14.15(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.32)(react-dom@18.2.0)(react@18.2.0)
+  idb:
+    specifier: ^7.1.1
+    version: 7.1.1
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -1684,6 +1687,10 @@ packages:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
     dependencies:
       react-is: 16.13.1
+    dev: false
+
+  /idb@7.1.1:
+    resolution: {integrity: sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ==}
     dev: false
 
   /ignore@5.2.4:

@@ -53,8 +53,8 @@ function App() {
 
 
             <Route path='plan'>
-              <Route path='/plan' element={<WithPlans><PlanListPage /></WithPlans>} />
-              <Route path="/plan/:planId" element={<WithPlans><EditPlanPage /></WithPlans>} />
+              <Route path='/plan' element={<PlanListPage />} />
+              <Route path="/plan/:planId" element={<EditPlanPage />} />
             </Route>
           </Routes>
         </Container>
