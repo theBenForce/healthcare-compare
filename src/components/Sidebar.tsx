@@ -1,3 +1,4 @@
+import PeopleIcon from '@mui/icons-material/PeopleRounded';
 import HomeIcon from '@mui/icons-material/HomeRounded';
 import PlansIcon from '@mui/icons-material/MedicationRounded';
 
@@ -32,6 +33,11 @@ const menuItems: Array<RootMenuRecord> = [
     path: '/plan',
     name: 'Plans',
     icon: <PlansIcon />,
+  },
+  {
+    path: '/person',
+    name: 'People',
+    icon: <PeopleIcon />,
   }
 ];
 

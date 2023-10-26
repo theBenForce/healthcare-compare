@@ -1,9 +1,12 @@
 import React from 'react';
+import { useAppContext } from '../providers/state';
+import { Stack } from '@mui/material';
 
 export const SummaryPage: React.FC = () => {
-  return (
-    <div>
-      <h1>Summary Page</h1>
-    </div>
-  );
+  const { setTitle } = useAppContext();
+  React.useEffect(() => {
+    setTitle('Healthcare Compare');
+  }, [setTitle]);
+
+  return <Stack spacing={2}></Stack>;
 };
