@@ -19,7 +19,9 @@ import { Sidebar } from './components/Sidebar';
 import { PlanListPage } from './pages/planList';
 import { WithPlans } from './providers/plans';
 import { useAppContext } from './providers/state';
-import { EditPlanPage } from './pages/editPlan';
+import { EditPlanPage } from './pages/planEdit';
+import { PeopleListPage } from './pages/personList';
+import { EditPersonPage } from './pages/personEdit';
 
 
 function App() {
@@ -55,6 +57,11 @@ function App() {
             <Route path='plan'>
               <Route path='/plan' element={<PlanListPage />} />
               <Route path="/plan/:planId" element={<EditPlanPage />} />
+            </Route>
+
+            <Route path='person'>
+              <Route path='/person' element={<PeopleListPage />} />
+              <Route path="/person/:personId" element={<EditPersonPage />} />
             </Route>
           </Routes>
         </Container>
