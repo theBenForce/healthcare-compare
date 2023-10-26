@@ -1,7 +1,7 @@
 import z from 'zod';
+import { BaseSchema } from './base.dto';
 
-export const PersonSchema = z.object({
-  id: z.string().ulid(),
+export const PersonSchema = BaseSchema.extend({
   name: z.string().min(3).max(255),
   expenses: z.array(z.object({
     coverageId: z.string().ulid(),

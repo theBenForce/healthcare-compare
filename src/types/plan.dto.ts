@@ -1,4 +1,5 @@
 import z from 'zod';
+import { BaseSchema } from './base.dto';
 
 export const PlanCoverageSchema = z.object({
   coverageId: z.string().ulid(),
@@ -8,8 +9,7 @@ export const PlanCoverageSchema = z.object({
   coPayment: z.number().min(0),
 }));
 
-export const PlanSchema = z.object({
-  id: z.string().ulid(),
+export const PlanSchema = BaseSchema.extend({
   name: z.string().min(3).max(255),
   description: z.string().min(3).max(255),
   premium: z.number({ description: 'Monthly cost of plan' }).min(0),
