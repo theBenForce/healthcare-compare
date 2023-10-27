@@ -1,28 +1,18 @@
+import { Fab, LinearProgress, Stack, TextField, Typography, useTheme } from '@mui/material';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { PersonSchema } from '../types/person.dto';
-import { Card, CardHeader, Fab, LinearProgress, Stack, TextField, Typography, useTheme } from '@mui/material';
-import { useAppContext } from '../providers/state';
+import { useAppContext } from '../../providers/state';
+import { PersonSchema } from '../../types/person.dto';
 
-import SaveIcon from "@mui/icons-material/SaveRounded";
 import ExpenseIcon from "@mui/icons-material/AttachMoneyRounded";
-import { useTable } from '../hooks/table';
-import { TableNames } from '../providers/db';
-import { ExpenseSchema } from '../types/expense.dto';
+import SaveIcon from "@mui/icons-material/SaveRounded";
 import { ulid } from 'ulidx';
+import { useTable } from '../../hooks/table';
+import { TableNames } from '../../providers/db';
+import { ExpenseSchema } from '../../types/expense.dto';
+import { ExpenseList } from './expenseList';
 
-const ExpenseList: React.FC<{ personId: string }> = ({ personId }) => {
-  const { values } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES, filter: { field: 'personId', value: personId! } });
 
-  return <>
-    <Typography variant="h6">Expenses</Typography>
-    <Stack spacing={2}>
-      {values.map(expense => <Card key={expense.id}>
-        <CardHeader title={expense.name} />
-      </Card>)}
-    </Stack>
-  </>
-};
 
 export const EditPersonPage: React.FC = () => {
   const { get, save } = useTable<PersonSchema>({ tableName: TableNames.PEOPLE });
