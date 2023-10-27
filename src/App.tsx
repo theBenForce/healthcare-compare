@@ -18,7 +18,7 @@ import { EntityList } from './components/EntityList';
 import { Sidebar } from './components/Sidebar';
 import { EditCategoryPage } from './pages/categoryEdit';
 import { EditPersonPage } from './pages/personEdit';
-import { EditPlanPage } from './pages/planEdit';
+import { EditPlanPage } from './pages/editPlan';
 import { SummaryPage } from './pages/summary';
 import { TableNames } from './providers/db';
 import { useAppContext } from './providers/state';
