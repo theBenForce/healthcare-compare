@@ -1,13 +1,13 @@
-import { Accordion, AccordionSummary, Avatar, Card, CardActions, CardContent, CardHeader, Chip, IconButton, Stack, Typography } from '@mui/material';
-import React from 'react';
+import { Card, CardActions, CardContent, CardHeader, Chip, IconButton } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
+import React from 'react';
 
+import DeleteIcon from '@mui/icons-material/DeleteRounded';
+import EditIcon from '@mui/icons-material/EditRounded';
+import { EditExpenseDialog } from '../../components/dialog/editExpense';
 import { useTable } from '../../hooks/table';
 import { TableNames } from '../../providers/db';
 import { ExpenseSchema } from '../../types/expense.dto';
-import { EditExpenseDialog } from '../../components/dialog/editExpense';
-import EditIcon from '@mui/icons-material/EditRounded';
-import DeleteIcon from '@mui/icons-material/DeleteRounded';
 
 
 export const ExpenseList: React.FC<{ personId: string }> = ({ personId }) => {
