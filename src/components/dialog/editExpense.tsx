@@ -1,10 +1,11 @@
 import React from 'react';
 
+import { Autocomplete, Button, DialogActions, DialogContent, DialogTitle, LinearProgress, Stack, TextField } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
 import { useTable } from '../../hooks/table';
 import { TableNames } from '../../providers/db';
-import Dialog from '@mui/material/Dialog';
 import { ExpenseSchema } from '../../types/expense.dto';
-import { Autocomplete, Button, DialogActions, DialogContent, DialogTitle, InputAdornment, LinearProgress, Stack, TextField } from '@mui/material';
+import { DollarField } from '../DollarField';
 import { MonthSelector } from '../MonthSelector';
 
 
@@ -39,28 +40,24 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({ expenseId,
 
   const onMonthsChanged = (months: number[]) => {
     console.info(`Months changed`, months);
-    setExpense(expense => ({ ...expense, months }));
+    setExpense(expense => ({ ...expense!, months }));
   };
 
   return <Dialog open={Boolean(expense)} onClose={onClose} maxWidth='md' fullWidth>
     <DialogTitle>{expense?.name ?? 'Expense'}</DialogTitle>
     <DialogContent>
       <Stack spacing={2} sx={{ my: 2 }}>
-        <TextField label="Name" value={expense?.name} onChange={(event) => setExpense(value => ({ ...value, name: event.target.value }))} />
+        <TextField label="Name" value={expense?.name} onChange={(event) => setExpense(value => ({ ...value!, name: event.target.value }))} />
         <Autocomplete
           renderInput={(params) => <TextField {...params} label="Category" />}
           value={expense?.categoryId}
           options={categories.map(x => x.id)}
           getOptionLabel={categoryId => categories.find(x => x.id === categoryId)?.name ?? ''}
-          onChange={(_event, categoryId) => setExpense(value => ({ ...value, categoryId: categoryId ?? '' }))} />
-        <TextField
+          onChange={(_event, categoryId) => setExpense(value => ({ ...value!, categoryId: categoryId ?? '' }))} />
+        <DollarField
           label="Monthly Amount"
-          InputProps={{
-            startAdornment: <InputAdornment position="start">$</InputAdornment>,
-          }}
           value={expense?.amount}
-          type='number'
-          onChange={(event) => setExpense(value => ({ ...value, amount: Number(event.target.value) }))}
+          onChange={(amount) => setExpense(value => ({ ...value!, amount }))}
         />
         <MonthSelector value={expense.months} onChange={onMonthsChanged} />
       </Stack>

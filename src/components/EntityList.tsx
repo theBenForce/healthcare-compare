@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardActions, CardHeader, IconButton, Stack, useTheme } from '@mui/material';
+import { Card, CardActions, CardHeader, IconButton, useTheme } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/AddRounded';
@@ -41,7 +41,9 @@ export const EntityList: React.FC<EntityListParams> = ({ table, title }) => {
 
   return <Grid container spacing={2}>
     {values.map(value => (<Grid xs={12} md={6} lg={4} xl={3} key={value.id}><Card>
-      <CardHeader title={value.name} content={value.description} />
+      <CardHeader
+        title={value.name}
+        subheader={value.description} />
       <CardActions>
         <IconButton onClick={() => navigate(`/${table}/${value.id}`)}>
           <EditIcon />
