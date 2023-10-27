@@ -10,9 +10,10 @@ export const DBContext = React.createContext<DBContextInterface>({
 });
 
 export enum TableNames {
-  PLANS = 'plans',
-  PEOPLE = 'people',
-  CATEGORIES = 'categories'
+  PLANS = 'plan',
+  PEOPLE = 'person',
+  CATEGORIES = 'category',
+  EXPENSES = 'expense',
 }
 
 export const useDB = () => React.useContext(DBContext);
@@ -27,9 +28,16 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
         console.info(`Upgrading DB`)
         for (const tableName of Object.values(TableNames)) {
           if (!database.objectStoreNames.contains(tableName)) {
-            database.createObjectStore(tableName, { keyPath: 'id' });
+            const table = database.createObjectStore(tableName, { keyPath: 'id' });
+
+            if (tableName === TableNames.EXPENSES) {
+              table.createIndex('personId', 'personId');
+              table.createIndex('categoryId', 'categoryId');
+            }
           }
         }
+
+
       },
     }).then((db) => {
       setDB(db);

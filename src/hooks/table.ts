@@ -12,15 +12,27 @@ export interface TableContextInterface<SchemaType extends BaseSchema> {
   values: SchemaType[];
 }
 
-export const useTable = <TableSchema extends BaseSchema>(tableName: TableNames): TableContextInterface<TableSchema> => {
+interface TableFilter {
+  field: string;
+  value: string;
+}
+
+interface UseTableParams {
+  tableName: TableNames;
+  filter?: TableFilter;
+}
+
+export const useTable = <TableSchema extends BaseSchema>({ tableName, filter }: UseTableParams): TableContextInterface<TableSchema> => {
   const { db } = useDB();
   const [values, setValues] = React.useState<TableSchema[]>([]);
 
   const list = React.useCallback(async () => {
-    const result = (await db?.getAll(tableName)) ?? [];
+    if (!db) return [];
+    
+    const result = await (filter ? db.getAllFromIndex(tableName, filter.field, filter.value) : db?.getAll(tableName));
     setValues(result);
     return result as Array<TableSchema>;
-  }, [db, tableName]);
+  }, [db, tableName, filter]);
 
   const create = async (newValue: TableSchema) => {
     await db?.add(tableName, newValue);

@@ -6,23 +6,22 @@ import React from 'react';
 import MenuIcon from '@mui/icons-material/MenuRounded';
 
 
+import Container from '@mui/material/Container';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
 import {
   Route,
   BrowserRouter as Router,
   Routes,
 } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import Container from '@mui/material/Container';
-import { SummaryPage } from './pages/summary';
+import { EntityList } from './components/EntityList';
 import { Sidebar } from './components/Sidebar';
-import { PlanListPage } from './pages/planList';
-import { useAppContext } from './providers/state';
-import { EditPlanPage } from './pages/planEdit';
-import { PeopleListPage } from './pages/personList';
-import { EditPersonPage } from './pages/personEdit';
-import { CategoryListPage } from './pages/categoryList';
 import { EditCategoryPage } from './pages/categoryEdit';
+import { EditPersonPage } from './pages/personEdit';
+import { EditPlanPage } from './pages/planEdit';
+import { SummaryPage } from './pages/summary';
+import { TableNames } from './providers/db';
+import { useAppContext } from './providers/state';
 
 
 function App() {
@@ -56,17 +55,17 @@ function App() {
 
 
             <Route path='plan'>
-              <Route path='/plan' element={<PlanListPage />} />
+              <Route path='/plan' element={<EntityList table={TableNames.PLANS} title='Plans' />} />
               <Route path="/plan/:planId" element={<EditPlanPage />} />
             </Route>
 
             <Route path='person'>
-              <Route path='/person' element={<PeopleListPage />} />
+              <Route path='/person' element={<EntityList table={TableNames.PEOPLE} title='People' />} />
               <Route path="/person/:personId" element={<EditPersonPage />} />
             </Route>
 
             <Route path='category'>
-              <Route path='/category' element={<CategoryListPage />} />
+              <Route path='/category' element={<EntityList table={TableNames.CATEGORIES} title='Categories' />} />
               <Route path="/category/:id" element={<EditCategoryPage />} />
             </Route>
           </Routes>
