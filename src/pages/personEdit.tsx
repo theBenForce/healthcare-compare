@@ -9,7 +9,7 @@ import { useTable } from '../hooks/table';
 import { TableNames } from '../providers/db';
 
 export const EditPersonPage: React.FC = () => {
-  const { get, save } = useTable<PersonSchema>(TableNames.PEOPLE);
+  const { get, save } = useTable<PersonSchema>({ tableName: TableNames.PEOPLE });
   const { personId } = useParams();
   const [person, setPerson] = React.useState<PersonSchema | null>(null);
   const { setTitle } = useAppContext();

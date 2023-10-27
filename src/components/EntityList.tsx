@@ -17,7 +17,7 @@ interface EntityListParams {
 }
 
 export const EntityList: React.FC<EntityListParams> = ({ table, title }) => {
-  const { values, create, remove } = useTable<BaseSchema>(table);
+  const { values, create, remove } = useTable<BaseSchema>({ tableName: table });
   const theme = useTheme();
   const navigate = useNavigate();
   const { setTitle } = useAppContext();

@@ -12,7 +12,7 @@ import { TableNames } from "../providers/db";
 export const EditPlanPage: React.FC = () => {
   const { setTitle } = useAppContext();
   const [plan, setPlan] = React.useState<PlanSchema | null>(null);
-  const { get: getPlan, save: savePlan } = useTable<PlanSchema>(TableNames.PLANS);
+  const { get: getPlan, save: savePlan } = useTable<PlanSchema>({ tableName: TableNames.PLANS });
   const { planId } = useParams();
   const theme = useTheme();
 

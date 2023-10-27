@@ -1,7 +1,5 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { usePeople } from '../providers/people';
-import { PersonSchema } from '../types/person.dto';
 import { Fab, LinearProgress, Stack, TextField, Typography, useTheme } from '@mui/material';
 import { useAppContext } from '../providers/state';
 
@@ -11,7 +9,7 @@ import { CategorySchema } from '../types/category.dto';
 import { TableNames } from '../providers/db';
 
 export const EditCategoryPage: React.FC = () => {
-  const { get, save } = useTable<CategorySchema>(TableNames.CATEGORIES);
+  const { get, save } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
   const { id } = useParams();
   const [category, setCategory] = React.useState<CategorySchema | null>(null);
   const { setTitle } = useAppContext();
