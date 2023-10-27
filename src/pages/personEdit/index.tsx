@@ -1,4 +1,4 @@
-import { Fab, LinearProgress, Stack, TextField, Typography, useTheme } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Fab, LinearProgress, Stack, TextField, Typography, useTheme } from '@mui/material';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppContext } from '../../providers/state';
@@ -11,6 +11,7 @@ import { useTable } from '../../hooks/table';
 import { TableNames } from '../../providers/db';
 import { ExpenseSchema } from '../../types/expense.dto';
 import { ExpenseList } from './expenseList';
+import { ExpandCircleDownRounded } from '@mui/icons-material';
 
 
 
@@ -62,7 +63,12 @@ export const EditPersonPage: React.FC = () => {
   return <Stack spacing={2}>
     <TextField fullWidth label="Name" value={person?.name} onChange={(event) => setPerson(person => ({ ...person, name: event.target.value }))} />
 
-    <ExpenseList personId={personId!} />
+    <Accordion>
+      <AccordionSummary expandIcon={<ExpandCircleDownRounded />}>Expenses</AccordionSummary>
+      <AccordionDetails>
+        <ExpenseList personId={personId!} />
+      </AccordionDetails>
+    </Accordion>
 
     <Stack spacing={2} sx={{ position: 'fixed', bottom: theme.spacing(2), right: theme.spacing(2), alignItems: 'center' }}>
       <Fab size='small' onClick={onAddExpense}>
