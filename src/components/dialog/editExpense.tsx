@@ -4,24 +4,32 @@ import { useTable } from '../../hooks/table';
 import { TableNames } from '../../providers/db';
 import Dialog from '@mui/material/Dialog';
 import { ExpenseSchema } from '../../types/expense.dto';
-import { Autocomplete, Button, DialogActions, DialogContent, DialogTitle, InputAdornment, Stack, TextField } from '@mui/material';
+import { Autocomplete, Button, DialogActions, DialogContent, DialogTitle, InputAdornment, LinearProgress, Stack, TextField } from '@mui/material';
 import { MonthSelector } from '../MonthSelector';
 
 
 interface EditExpenseDialogProps {
-  expense?: ExpenseSchema | null;
+  expenseId?: string | null;
   onClose: () => void;
 }
 
-export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({ expense: initialExpense, onClose }) => {
+export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({ expenseId, onClose }) => {
   const [expense, setExpense] = React.useState<ExpenseSchema | null>(null);
   const { values: categories } = useTable({ tableName: TableNames.CATEGORIES });
-  const { save } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES });
+  const { save, get } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES });
 
   React.useEffect(() => {
-    setExpense(initialExpense ?? null);
-  }, [initialExpense]);
-  if (!expense) return null;
+    if (!expenseId) return;
+
+    get(expenseId).then(setExpense);
+  }, [expenseId, setExpense, get]);
+
+  if (!expenseId) return null;
+
+  if (!expense) return <Dialog open={Boolean(expenseId)} onClose={onClose} maxWidth='md' fullWidth>
+    <DialogTitle>Loading...</DialogTitle>
+    <DialogContent><LinearProgress /></DialogContent>
+  </Dialog>;
 
   const onSave = async () => {
     console.info(`Saving expense`, expense);
@@ -29,8 +37,13 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({ expense: i
     onClose();
   };
 
+  const onMonthsChanged = (months: number[]) => {
+    console.info(`Months changed`, months);
+    setExpense(expense => ({ ...expense, months }));
+  };
+
   return <Dialog open={Boolean(expense)} onClose={onClose} maxWidth='md' fullWidth>
-    <DialogTitle>{expense?.name}</DialogTitle>
+    <DialogTitle>{expense?.name ?? 'Expense'}</DialogTitle>
     <DialogContent>
       <Stack spacing={2} sx={{ my: 2 }}>
         <TextField label="Name" value={expense?.name} onChange={(event) => setExpense(value => ({ ...value, name: event.target.value }))} />
@@ -39,9 +52,9 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({ expense: i
           value={expense?.categoryId}
           options={categories.map(x => x.id)}
           getOptionLabel={categoryId => categories.find(x => x.id === categoryId)?.name ?? ''}
-          onChange={(event, categoryId) => setExpense(value => ({ ...value, categoryId: categoryId ?? '' }))} />
+          onChange={(_event, categoryId) => setExpense(value => ({ ...value, categoryId: categoryId ?? '' }))} />
         <TextField
-          label="Amount"
+          label="Monthly Amount"
           InputProps={{
             startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
@@ -49,7 +62,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({ expense: i
           type='number'
           onChange={(event) => setExpense(value => ({ ...value, amount: Number(event.target.value) }))}
         />
-        <MonthSelector value={expense.months} onChange={months => setExpense(expense => ({ ...expense, months }))} />
+        <MonthSelector value={expense.months} onChange={onMonthsChanged} />
       </Stack>
     </DialogContent>
     <DialogActions>

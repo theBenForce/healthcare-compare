@@ -10,7 +10,7 @@ import EditIcon from '@mui/icons-material/EditRounded';
 
 export const ExpenseList: React.FC<{ personId: string }> = ({ personId }) => {
   const { values } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES, filter: { field: 'personId', value: personId! } });
-  const [selectedExpense, setSelectedExpense] = React.useState<ExpenseSchema | null>(null);
+  const [selectedExpense, setSelectedExpense] = React.useState<string | null>(null);
 
   return <>
     <Typography variant="h6">Expenses</Typography>
@@ -18,13 +18,13 @@ export const ExpenseList: React.FC<{ personId: string }> = ({ personId }) => {
       {values.map(expense => <Card key={expense.id}>
         <CardHeader title={expense.name} />
         <CardActions>
-          <IconButton onClick={() => setSelectedExpense(expense)}>
+          <IconButton onClick={() => setSelectedExpense(expense.id)}>
             <EditIcon />
           </IconButton>
         </CardActions>
       </Card>)}
     </Stack>
 
-    <EditExpenseDialog expense={selectedExpense} onClose={() => setSelectedExpense(null)} />
+    <EditExpenseDialog expenseId={selectedExpense} onClose={() => setSelectedExpense(null)} />
   </>
 };
