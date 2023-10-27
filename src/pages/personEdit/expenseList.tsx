@@ -15,14 +15,18 @@ export const ExpenseList: React.FC<{ personId: string }> = ({ personId }) => {
   return <>
     <Typography variant="h6">Expenses</Typography>
     <Stack spacing={2}>
-      {values.map(expense => <Card key={expense.id}>
-        <CardHeader title={expense.name} />
-        <CardActions>
-          <IconButton onClick={() => setSelectedExpense(expense.id)}>
-            <EditIcon />
-          </IconButton>
-        </CardActions>
-      </Card>)}
+      {values.map(expense => {
+        const totalCost = expense.months.length * expense.amount;
+
+        return <Card key={expense.id}>
+          <CardHeader title={expense.name} subheader={`Total Cost: $${totalCost.toFixed(2)}`} />
+          <CardActions>
+            <IconButton onClick={() => setSelectedExpense(expense.id)}>
+              <EditIcon />
+            </IconButton>
+          </CardActions>
+        </Card>;
+      })}
     </Stack>
 
     <EditExpenseDialog expenseId={selectedExpense} onClose={() => setSelectedExpense(null)} />
