@@ -10,9 +10,10 @@ export const DBContext = React.createContext<DBContextInterface>({
 });
 
 export enum TableNames {
-  PLANS = 'plans',
-  PEOPLE = 'people',
-  CATEGORIES = 'categories'
+  PLANS = 'plan',
+  PEOPLE = 'person',
+  CATEGORIES = 'category',
+  EXPENSES = 'expense',
 }
 
 export const useDB = () => React.useContext(DBContext);

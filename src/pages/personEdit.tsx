@@ -1,14 +1,15 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { usePeople } from '../providers/people';
 import { PersonSchema } from '../types/person.dto';
 import { Fab, LinearProgress, Stack, TextField, Typography, useTheme } from '@mui/material';
 import { useAppContext } from '../providers/state';
 
 import SaveIcon from "@mui/icons-material/SaveRounded";
+import { useTable } from '../hooks/table';
+import { TableNames } from '../providers/db';
 
 export const EditPersonPage: React.FC = () => {
-  const { get, save } = usePeople();
+  const { get, save } = useTable<PersonSchema>(TableNames.PEOPLE);
   const { personId } = useParams();
   const [person, setPerson] = React.useState<PersonSchema | null>(null);
   const { setTitle } = useAppContext();

@@ -2,16 +2,17 @@
 import React from "react";
 import { PlanSchema } from "../types/plan.dto";
 import { useAppContext } from "../providers/state";
-import { usePlans } from "../providers/plans";
 import { useParams } from "react-router-dom";
 import SaveIcon from "@mui/icons-material/SaveRounded";
 import { Accordion, AccordionDetails, AccordionSummary, Fab, FormControlLabel, LinearProgress, Stack, Switch, TextField, Typography, useTheme } from "@mui/material";
 import { ExpandCircleDownRounded } from "@mui/icons-material";
+import { useTable } from "../hooks/table";
+import { TableNames } from "../providers/db";
 
 export const EditPlanPage: React.FC = () => {
   const { setTitle } = useAppContext();
   const [plan, setPlan] = React.useState<PlanSchema | null>(null);
-  const { get: getPlan, save: savePlan } = usePlans();
+  const { get: getPlan, save: savePlan } = useTable<PlanSchema>(TableNames.PLANS);
   const { planId } = useParams();
   const theme = useTheme();
 
