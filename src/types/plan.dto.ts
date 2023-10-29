@@ -2,14 +2,6 @@ import z from 'zod';
 import { BaseSchema } from './base.dto';
 import { TableNames } from '../providers/db';
 
-export const PlanCoverageSchema = z.object({
-  coverageId: z.string().ulid(),
-  coInsurance: z.number().min(0).max(100),
-}).or(z.object({
-  coverageId: z.string().ulid(),
-  coPayment: z.number().min(0),
-}));
-
 export const PlanLimitSchema = z.object({
   deductible: z.number({ description: 'Amount of deductible in dollars' }).min(0),
   familyDeductible: z.number({ description: 'Amount of family deductible in dollars' }).min(0),

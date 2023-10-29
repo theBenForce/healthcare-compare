@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Autocomplete, Button, DialogActions, DialogContent, DialogTitle, LinearProgress, Stack, TextField } from '@mui/material';
+import { Autocomplete, Button, DialogActions, DialogContent, DialogTitle, FormControlLabel, LinearProgress, Stack, Switch, TextField } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import { useTable } from '../../hooks/table';
 import { TableNames } from '../../providers/db';
@@ -50,6 +50,7 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({ expenseId,
     <DialogContent>
       <Stack spacing={2} sx={{ my: 2 }}>
         <TextField label="Name" value={expense?.name} onChange={(event) => setExpense(value => ({ ...value!, name: event.target.value }))} />
+
         {!categoryId && <EntitySelector label="Category" value={expense?.categoryId ?? null} onChange={(categoryId) => setExpense(value => ({ ...value!, categoryId: categoryId ?? '' }))} table={TableNames.CATEGORIES} />}
         {!personId && <EntitySelector label="Person" value={expense?.personId ?? null} onChange={(personId) => setExpense(value => ({ ...value!, personId: personId ?? '' }))} table={TableNames.PEOPLE} />}
         <DollarField

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Accordion, AccordionDetails, AccordionSummary, Fab, LinearProgress, Stack, TextField, Typography, useTheme } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Fab, FormControlLabel, LinearProgress, Stack, Switch, TextField, Typography, useTheme } from '@mui/material';
 import { useAppContext } from '../providers/state';
 
 import SaveIcon from "@mui/icons-material/SaveRounded";
@@ -61,7 +61,9 @@ export const EditCategoryPage: React.FC = () => {
   return <Stack spacing={2}>
     <TextField fullWidth label="Name" value={category.name} onChange={(event) => setCategory(value => ({ ...value!, name: event.target.value }))} />
 
-    <Accordion>
+    <FormControlLabel control={<Switch checked={category?.isInNetwork} onChange={(event) => setCategory(value => ({ ...value!, isInNetwork: event.target.checked }))} />} label="In-Network" />
+
+    <Accordion defaultExpanded>
       <AccordionSummary expandIcon={<ExpandCircleDownRounded />}>Expenses</AccordionSummary>
       <AccordionDetails>
         <ExpenseList categoryId={category.id!} />

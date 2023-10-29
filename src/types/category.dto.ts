@@ -4,6 +4,7 @@ import { TableNames } from '../providers/db';
 
 export const CategorySchema = BaseSchema.extend({
   type: z.literal(TableNames.CATEGORIES),
+  isInNetwork: z.boolean().optional(),
 });
 
 export type CategorySchema = z.infer<typeof CategorySchema>;

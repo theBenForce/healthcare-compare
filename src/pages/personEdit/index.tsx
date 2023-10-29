@@ -64,7 +64,7 @@ export const EditPersonPage: React.FC = () => {
   return <Stack spacing={2}>
     <TextField fullWidth label="Name" value={person?.name} onChange={(event) => setPerson(person => ({ ...person, name: event.target.value }))} />
 
-    <Accordion>
+    <Accordion defaultExpanded>
       <AccordionSummary expandIcon={<ExpandCircleDownRounded />}>Expenses</AccordionSummary>
       <AccordionDetails>
         <ExpenseList personId={personId!} />
