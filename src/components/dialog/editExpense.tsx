@@ -7,16 +7,18 @@ import { TableNames } from '../../providers/db';
 import { ExpenseSchema } from '../../types/expense.dto';
 import { DollarField } from '../DollarField';
 import { MonthSelector } from '../MonthSelector';
+import { EntitySelector } from '../EntitySelector';
 
 
 interface EditExpenseDialogProps {
   expenseId?: string | null;
+  personId?: string;
+  categoryId?: string;
   onClose: () => void;
 }
 
-export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({ expenseId, onClose }) => {
+export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({ expenseId, onClose, personId, categoryId }) => {
   const [expense, setExpense] = React.useState<ExpenseSchema | null>(null);
-  const { values: categories } = useTable({ tableName: TableNames.CATEGORIES });
   const { save, get } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES });
 
   React.useEffect(() => {
@@ -48,12 +50,8 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({ expenseId,
     <DialogContent>
       <Stack spacing={2} sx={{ my: 2 }}>
         <TextField label="Name" value={expense?.name} onChange={(event) => setExpense(value => ({ ...value!, name: event.target.value }))} />
-        <Autocomplete
-          renderInput={(params) => <TextField {...params} label="Category" />}
-          value={expense?.categoryId}
-          options={categories.map(x => x.id)}
-          getOptionLabel={categoryId => categories.find(x => x.id === categoryId)?.name ?? ''}
-          onChange={(_event, categoryId) => setExpense(value => ({ ...value!, categoryId: categoryId ?? '' }))} />
+        {!categoryId && <EntitySelector label="Category" value={expense?.categoryId ?? null} onChange={(categoryId) => setExpense(value => ({ ...value!, categoryId: categoryId ?? '' }))} table={TableNames.CATEGORIES} />}
+        {!personId && <EntitySelector label="Person" value={expense?.personId ?? null} onChange={(personId) => setExpense(value => ({ ...value!, personId: personId ?? '' }))} table={TableNames.PEOPLE} />}
         <DollarField
           label="Monthly Amount"
           value={expense?.amount}

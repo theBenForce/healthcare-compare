@@ -19,11 +19,21 @@ export const PlanLimitSchema = z.object({
 export type PlanLimitSchema = z.infer<typeof PlanLimitSchema>;
 
 export const PlanSchema = BaseSchema.extend({
-  premium: z.number({ description: 'Monthly cost of plan' }).min(0),
-  isFamilyPlan: z.boolean().default(false),
+  monthlyPremium: z.number({ description: 'Monthly cost of plan' }).min(0),
+  isFamilyPlan: z.boolean().default(false).optional(),
+  isCombinedDeductible: z.boolean().default(false).optional(),
   inNetworkLimt: PlanLimitSchema,
   outOfNetworkLimit: PlanLimitSchema,
   discount: z.number({ description: 'Amount of discount in dollars' }).min(0).optional(),
 });
 
 export type PlanSchema = z.infer<typeof PlanSchema>;
+
+export function isPlanSchema(data: unknown): data is PlanSchema {
+  try {
+    PlanSchema.parse(data);
+    return true;
+  } catch {
+    return false;
+  }
+}
