@@ -1,6 +1,7 @@
 import React from 'react';
 import { TableNames, useDB } from '../providers/db';
 import { BaseSchema } from '../types/base.dto';
+import { CoverageSchema } from '../types/coverage.dto';
 
 
 export interface TableContextInterface<SchemaType extends BaseSchema> {
@@ -17,7 +18,7 @@ interface UseTableParams {
   filter?: Record<string, string | undefined>;
 }
 
-export const useTable = <TableSchema extends BaseSchema>({ tableName, filter }: UseTableParams): TableContextInterface<TableSchema> => {
+export const useTable = <TableSchema extends BaseSchema | CoverageSchema>({ tableName, filter }: UseTableParams): TableContextInterface<TableSchema> => {
   const { db } = useDB();
   const [values, setValues] = React.useState<TableSchema[]>([]);
 
@@ -59,7 +60,10 @@ export const useTable = <TableSchema extends BaseSchema>({ tableName, filter }: 
     console.info(`get ${tableName} ${id}`);
     return db?.get(tableName, id)?.then((value) => ({...value, type: tableName}) || null);
   }, [db, tableName]);
-  const save = React.useCallback(async (entity: TableSchema) => { await db?.put(tableName, entity); await list(); }, [db, list, tableName]);
+  const save = React.useCallback(async (entity: TableSchema) => {
+    await db?.put(tableName, entity);
+    await list();
+  }, [db, list, tableName]);
 
   React.useEffect(() => {
     list();

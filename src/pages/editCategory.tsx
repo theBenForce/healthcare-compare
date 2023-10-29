@@ -12,6 +12,7 @@ import { ExpenseList } from './personEdit/expenseList';
 import { ulid } from 'ulidx';
 import { ExpenseSchema } from '../types/expense.dto';
 import ExpenseIcon from "@mui/icons-material/AttachMoneyRounded";
+import { CoverageList } from '../components/CoverageList';
 
 export const EditCategoryPage: React.FC = () => {
   const { get, save } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
@@ -63,12 +64,20 @@ export const EditCategoryPage: React.FC = () => {
 
     <FormControlLabel control={<Switch checked={category?.isInNetwork} onChange={(event) => setCategory(value => ({ ...value!, isInNetwork: event.target.checked }))} />} label="In-Network" />
 
-    <Accordion defaultExpanded>
-      <AccordionSummary expandIcon={<ExpandCircleDownRounded />}>Expenses</AccordionSummary>
-      <AccordionDetails>
-        <ExpenseList categoryId={category.id!} />
-      </AccordionDetails>
-    </Accordion>
+    <Stack>
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandCircleDownRounded />}>Expenses</AccordionSummary>
+        <AccordionDetails>
+          <ExpenseList categoryId={category.id!} />
+        </AccordionDetails>
+      </Accordion>
+      <Accordion defaultExpanded>
+        <AccordionSummary expandIcon={<ExpandCircleDownRounded />}>Coverages</AccordionSummary>
+        <AccordionDetails>
+          <CoverageList categoryId={category.id} />
+        </AccordionDetails>
+      </Accordion>
+    </Stack>
 
     <Stack spacing={2} sx={{ position: 'fixed', bottom: theme.spacing(2), right: theme.spacing(2), alignItems: 'center' }}>
       <Fab size='small' onClick={onAddExpense}>
