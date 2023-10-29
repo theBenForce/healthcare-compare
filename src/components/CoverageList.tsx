@@ -12,6 +12,7 @@ import { EditCoverageDialog } from './dialog/editCoverage';
 import { ulid } from 'ulidx';
 import { PlanSchema } from '../types/plan.dto';
 import { CategorySchema } from '../types/category.dto';
+import { useCoverages } from '../hooks/coverages';
 
 interface CoverageListParams {
   planId?: string;
@@ -80,7 +81,8 @@ const EditToolbar: React.FC<EditToolbarProps> = ({ planId, categoryId }) => {
 }
 
 export const CoverageList: React.FC<CoverageListParams> = ({ planId, categoryId }) => {
-  const { values: coverages, remove, save } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES, filter: { planId, categoryId } });
+  const { remove, save } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES });
+  const coverages = useCoverages({ planId, categoryId });
   const [editingCoverageId, setEditingCoverageId] = React.useState<string | null>(null);
 
   const { values: plans } = useTable<PlanSchema>({ tableName: TableNames.PLANS });
