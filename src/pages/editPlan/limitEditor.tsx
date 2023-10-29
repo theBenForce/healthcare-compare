@@ -5,7 +5,7 @@ import { PlanLimitSchema } from '../../types/plan.dto';
 
 interface PlanLimitEditorParams {
   value?: PlanLimitSchema;
-  isFamilyPlan: boolean;
+  isFamilyPlan?: boolean;
   onChange: (value: PlanLimitSchema) => void;
 }
 

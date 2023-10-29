@@ -16,7 +16,7 @@ import {
 } from 'react-router-dom';
 import { EntityList } from './components/EntityList';
 import { Sidebar } from './components/Sidebar';
-import { EditCategoryPage } from './pages/categoryEdit';
+import { EditCategoryPage } from './pages/editCategory';
 import { EditPersonPage } from './pages/personEdit';
 import { EditPlanPage } from './pages/editPlan';
 import { SummaryPage } from './pages/summary';

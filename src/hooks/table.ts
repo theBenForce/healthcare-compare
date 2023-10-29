@@ -12,14 +12,9 @@ export interface TableContextInterface<SchemaType extends BaseSchema> {
   values: SchemaType[];
 }
 
-interface TableFilter {
-  field: string;
-  value: string;
-}
-
 interface UseTableParams {
   tableName: TableNames;
-  filter?: TableFilter;
+  filter?: Record<string, string | undefined>;
 }
 
 export const useTable = <TableSchema extends BaseSchema>({ tableName, filter }: UseTableParams): TableContextInterface<TableSchema> => {
@@ -28,8 +23,21 @@ export const useTable = <TableSchema extends BaseSchema>({ tableName, filter }: 
 
   const list = React.useCallback(async () => {
     if (!db) return [];
+
+    let result;
+    if (filter) {
+      const filterEntries = Object.entries(filter).filter(([, value]) => value);
+
+      if (filterEntries.length > 0) {
+        const [index, value] = filterEntries[0];
+        result = await db.getAllFromIndex(tableName, index, value);
+      }
+    }
     
-    const result = await (filter ? db.getAllFromIndex(tableName, filter.field, filter.value) : db?.getAll(tableName));
+    if(!result) {
+      result = await db?.getAll(tableName);
+    }
+    
     setValues(result);
     return result as Array<TableSchema>;
   }, [db, tableName, filter]);

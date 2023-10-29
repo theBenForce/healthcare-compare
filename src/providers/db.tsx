@@ -23,8 +23,8 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
 
   React.useEffect(() => {
     console.info(`Initializing DB`);
-    openDB('healthcare-compare', 1, {
-      upgrade(database) {
+    openDB('healthcare-compare', 2, {
+      async upgrade(database, oldVersion, newVersion, transaction) {
         console.info(`Upgrading DB`)
         for (const tableName of Object.values(TableNames)) {
           if (!database.objectStoreNames.contains(tableName)) {
@@ -37,7 +37,16 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
           }
         }
 
+        if (oldVersion < 2) {
+          const plans = transaction.objectStore(TableNames.PLANS);
+          const allPlans = await plans.getAll();
 
+          for (const plan of allPlans) {
+            plan.monthlyPremium = plan.premium;
+            delete plan.premium;
+            await plans.put(plan);
+          }
+        }
       },
     }).then((db) => {
       setDB(db);

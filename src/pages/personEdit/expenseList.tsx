@@ -10,8 +10,8 @@ import { TableNames } from '../../providers/db';
 import { ExpenseSchema } from '../../types/expense.dto';
 
 
-export const ExpenseList: React.FC<{ personId: string }> = ({ personId }) => {
-  const { values, remove } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES, filter: { field: 'personId', value: personId! } });
+export const ExpenseList: React.FC<{ personId?: string; categoryId?: string }> = ({ personId, categoryId }) => {
+  const { values, remove } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES, filter: { personId, categoryId } });
   const { values: categories } = useTable({ tableName: TableNames.CATEGORIES });
   const [selectedExpense, setSelectedExpense] = React.useState<string | null>(null);
 
@@ -44,6 +44,10 @@ export const ExpenseList: React.FC<{ personId: string }> = ({ personId }) => {
     })}
   </Grid>
 
-    <EditExpenseDialog expenseId={selectedExpense} onClose={() => setSelectedExpense(null)} />
+    <EditExpenseDialog
+      personId={personId}
+      categoryId={categoryId}
+      expenseId={selectedExpense}
+      onClose={() => setSelectedExpense(null)} />
   </>
 };

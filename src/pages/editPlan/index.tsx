@@ -44,9 +44,10 @@ export const EditPlanPage: React.FC = () => {
     <TextField fullWidth label="Name" value={plan?.name} onChange={(event) => setPlan(plan => ({ ...plan!, name: event.target.value }))} />
 
     <TextField fullWidth label="Description" value={plan?.description} onChange={(event) => setPlan(plan => ({ ...plan!, description: event.target.value }))} />
-    <TextField fullWidth label="Monthly Premium" type="number" value={plan?.premium} onChange={(event) => setPlan(plan => ({ ...plan!, premium: Number(event.target.value) }))} />
+    <TextField fullWidth label="Monthly Premium" type="number" value={plan?.monthlyPremium} onChange={(event) => setPlan(plan => ({ ...plan!, monthlyPremium: Number(event.target.value) }))} />
     <TextField fullWidth label="Discount" type="number" value={plan?.discount} onChange={(event) => setPlan(plan => ({ ...plan!, discount: Number(event.target.value) }))} />
 
+    <FormControlLabel control={<Switch checked={plan?.isCombinedDeductible} onChange={(event) => setPlan(plan => ({ ...plan!, isCombinedDeductible: event.target.checked }))} />} label="Combined Deductibles" />
     <FormControlLabel control={<Switch checked={plan?.isFamilyPlan} onChange={(event) => setPlan(plan => ({ ...plan!, isFamilyPlan: event.target.checked }))} />} label="Family Plan" />
 
 
