@@ -13,6 +13,7 @@ import { ExpenseSchema } from '../../types/expense.dto';
 export const ExpenseList: React.FC<{ personId?: string; categoryId?: string }> = ({ personId, categoryId }) => {
   const { values, remove } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES, filter: { personId, categoryId } });
   const { values: categories } = useTable({ tableName: TableNames.CATEGORIES });
+  const { values: people } = useTable({ tableName: TableNames.PEOPLE });
   const [selectedExpense, setSelectedExpense] = React.useState<string | null>(null);
 
   const onDelete = (expenseId: string) => () => {
@@ -23,13 +24,15 @@ export const ExpenseList: React.FC<{ personId?: string; categoryId?: string }> =
     {values.map(expense => {
       const totalCost = expense.months.length * expense.amount;
       const categoryName = categories.find(x => x.id === expense.categoryId)?.name ?? 'Unknown';
+      const personName = people.find(x => x.id === expense.personId)?.name ?? 'Unknown';
 
       return <Grid key={expense.id} xs={3}><Card>
         <CardHeader
           title={expense.name}
           subheader={`Total Cost: $${totalCost.toFixed(2)}`} />
         <CardContent>
-          <Chip label={categoryName} />
+          {personId && <Chip label={categoryName} />}
+          {categoryId && <Chip label={personName} />}
         </CardContent>
         <CardActions>
           <IconButton onClick={() => setSelectedExpense(expense.id)}>

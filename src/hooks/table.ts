@@ -6,9 +6,9 @@ import { BaseSchema } from '../types/base.dto';
 export interface TableContextInterface<SchemaType extends BaseSchema> {
   list: () => Promise<SchemaType[]>;
   create: (value: SchemaType) => Promise<string>;
-  get: (planId: string) => Promise<SchemaType | null>;
-  save: (plan: SchemaType) => Promise<void>;
-  remove: (planId: string) => Promise<void>;
+  get: (id: string) => Promise<SchemaType | null>;
+  save: (value: SchemaType) => Promise<void>;
+  remove: (id: string) => Promise<void>;
   values: SchemaType[];
 }
 
@@ -35,28 +35,31 @@ export const useTable = <TableSchema extends BaseSchema>({ tableName, filter }: 
     }
     
     if(!result) {
-      result = await db?.getAll(tableName);
+      result = await db?.getAll(tableName).then((values) => values.map(v => ({...v, type: tableName})) || []);
     }
     
     setValues(result);
     return result as Array<TableSchema>;
   }, [db, tableName, filter]);
 
-  const create = async (newValue: TableSchema) => {
-    await db?.add(tableName, newValue);
+  const create = async (value: TableSchema) => {
+    await db?.add(tableName, value);
 
     await list();
 
-    return newValue.id;
+    return value.id;
   };
 
-  const remove = React.useCallback(async (planId: string) => {
-    await db?.delete(tableName, planId);
+  const remove = React.useCallback(async (id: string) => {
+    await db?.delete(tableName, id);
     await list();
   }, [db, list, tableName]);
 
-  const get = React.useCallback(async (planId: string) => db?.get(tableName, planId), [db, tableName]);
-  const save = React.useCallback(async (plan: TableSchema) => { await db?.put(tableName, plan); await list(); }, [db, list, tableName]);
+  const get = React.useCallback(async (id: string) => {
+    console.info(`get ${tableName} ${id}`);
+    return db?.get(tableName, id)?.then((value) => ({...value, type: tableName}) || null);
+  }, [db, tableName]);
+  const save = React.useCallback(async (entity: TableSchema) => { await db?.put(tableName, entity); await list(); }, [db, list, tableName]);
 
   React.useEffect(() => {
     list();
