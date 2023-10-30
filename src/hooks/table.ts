@@ -32,7 +32,6 @@ export const useTable = <TableSchema extends BaseSchema | CoverageSchema>({ tabl
 
       if (filterEntries.length > 0) {
         const [index, value] = filterEntries[0];
-        console.info(`Using index ${index} with value ${value} on table ${tableName}`);
         result = await db.getAllFromIndex(tableName, index, value);
       }
     }
