@@ -32,15 +32,18 @@ export const useCostReport = (): CostReport => {
         }
 
         let inNetworkCharges = 0;
+        const individualInNetworkCharges = Object.fromEntries(people.map(p => [p.id, 0]));
         let outOfNetworkCharges = 0;
-        let isPastNetworkDeductible = false;
-        let isPastOutOfNetworkDeductible = false;
+        const individualOutOfNetworkCharges = Object.fromEntries(people.map(p => [p.id, 0]));
 
         monthlyExpenses.flat(1).forEach((expense) => {
           const coverage = coverages.find(c => c.categoryId === expense.categoryId);
           if (!coverage) return;
 
-          const coverageValue = ((coverage.isInNetwork || plan.isCombinedDeductible) ? isPastNetworkDeductible : isPastOutOfNetworkDeductible) ?
+          const pastIndividualDeductible = (coverage.isInNetwork || plan.isCombinedDeductible) ? individualInNetworkCharges[expense.personId] >= plan.inNetworkLimt.deductible : individualOutOfNetworkCharges[expense.personId] >= plan.outOfNetworkLimit.deductible;
+          const pastFamilyDeductible = (coverage.isInNetwork || plan.isCombinedDeductible) ? inNetworkCharges >= plan.inNetworkLimt.deductible : outOfNetworkCharges >= plan.outOfNetworkLimit.deductible;
+
+          const coverageValue = (pastIndividualDeductible || pastFamilyDeductible) ?
             coverage.afterDeductible : coverage.beforeDeductible;
           
           let amount = expense.amount;
@@ -51,18 +54,29 @@ export const useCostReport = (): CostReport => {
             amount = coverageValue.amount;
           }
 
-          if(coverage.isInNetwork) {
-            inNetworkCharges += amount;
-          } else {
-            outOfNetworkCharges += amount;
-          }
+          if (coverage.isInNetwork) {
+            if (individualInNetworkCharges[expense.personId] + amount > plan.inNetworkLimt.outOfPocketMax) {
+              amount = plan.inNetworkLimt.outOfPocketMax - individualInNetworkCharges[expense.personId];
+            }
 
-          if (plan.isCombinedDeductible) {
-            isPastNetworkDeductible = inNetworkCharges + outOfNetworkCharges >= plan.inNetworkLimt.deductible;
-          } else if(coverage.isInNetwork) {
-            isPastNetworkDeductible = inNetworkCharges >= plan.inNetworkLimt.deductible;
+            const outOfPocketMax = plan.isFamilyPlan ? plan.inNetworkLimt.familyOutOfPocketMax : plan.inNetworkLimt.outOfPocketMax;
+            if (inNetworkCharges + amount > outOfPocketMax) {
+              amount = plan.inNetworkLimt.outOfPocketMax - inNetworkCharges;
+            }
+
+            inNetworkCharges += amount;
+            individualInNetworkCharges[expense.personId] += amount;
           } else {
-            isPastOutOfNetworkDeductible = outOfNetworkCharges >= plan.outOfNetworkLimit.deductible;
+            if(individualOutOfNetworkCharges[expense.personId] + amount > plan.outOfNetworkLimit.outOfPocketMax) {
+              amount = plan.outOfNetworkLimit.outOfPocketMax - individualOutOfNetworkCharges[expense.personId];
+            }
+
+            const outOfPocketMax = plan.isFamilyPlan ? plan.outOfNetworkLimit.familyOutOfPocketMax : plan.outOfNetworkLimit.outOfPocketMax;
+            if (outOfNetworkCharges + amount > outOfPocketMax) {
+              amount = plan.outOfNetworkLimit.outOfPocketMax - outOfNetworkCharges;
+            }
+
+            outOfNetworkCharges += amount;
           }
         });
 
