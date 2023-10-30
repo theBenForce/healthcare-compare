@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, LinearProgress, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputAdornment, InputLabel, LinearProgress, MenuItem, Select, Stack, Switch, TextField, Typography } from '@mui/material';
 import React from 'react';
 import { EntitySelector } from '../EntitySelector';
 import { TableNames } from '../../providers/db';
@@ -30,11 +30,20 @@ export const CoverageEditor: React.FC<CoverageEditorProps> = ({ value, onChange 
         onChange={(event) => onChange({ ...value, type: event.target.value as CoverageValue['type'] })}
       >
         <MenuItem value='copay'>Copay</MenuItem>
-        <MenuItem value='percent'>Percent</MenuItem>
+        <MenuItem value='percent'>Co-Insurance</MenuItem>
       </Select>
     </FormControl>
 
-    <TextField sx={{ flex: 1 }} label="Amount" type="number" value={value.amount} onChange={(event) => onChange({ ...value, amount: parseFloat(event.target.value) })} />
+    <TextField
+      sx={{ flex: 1 }}
+      label="Amount"
+      type="number"
+      value={value.amount}
+      InputProps={{
+        startAdornment: value.type === 'copay' && <InputAdornment position='start'>$</InputAdornment>,
+        endAdornment: value.type === 'percent' && <InputAdornment position='end'>%</InputAdornment>,
+      }}
+      onChange={(event) => onChange({ ...value, amount: parseFloat(event.target.value) })} />
   </Stack>;
 };
 
@@ -60,8 +69,15 @@ export const EditCoverageDialog: React.FC<EditCoverageDialogProps> = ({ coverage
         <LinearProgress />
       </Stack>}
       {coverage && <Stack spacing={2} sx={{ my: 2 }}>
-        {planId && <EntitySelector table={TableNames.CATEGORIES} value={coverage.categoryId} onChange={(categoryId) => setCoverage((value) => ({ ...value!, categoryId: categoryId! }))} label={'Category'} />}
-        {categoryId && <EntitySelector table={TableNames.PLANS} value={coverage.planId} onChange={(planId) => setCoverage((value) => ({ ...value!, planId: planId! }))} label={'Plan'} />}
+
+        <Stack direction='row' spacing={2}>
+          {planId && <EntitySelector sx={{ flex: 3 }} table={TableNames.CATEGORIES} value={coverage.categoryId} onChange={(categoryId) => setCoverage((value) => ({ ...value!, categoryId: categoryId! }))} label={'Category'} />}
+          {categoryId && <EntitySelector sx={{ flex: 3 }} table={TableNames.PLANS} value={coverage.planId} onChange={(planId) => setCoverage((value) => ({ ...value!, planId: planId! }))} label={'Plan'} />}
+
+          <FormControlLabel control={<Switch checked={coverage.isInNetwork} onChange={(event) => setCoverage((value) => ({ ...value!, isInNetwork: event.target.checked }))} />} label="In Network" />
+
+        </Stack>
+
         <Typography variant='h6'>Before Deductible</Typography>
         <CoverageEditor value={coverage.beforeDeductible} onChange={(beforeDeductible) => setCoverage((value) => ({ ...value!, beforeDeductible }))} />
 
