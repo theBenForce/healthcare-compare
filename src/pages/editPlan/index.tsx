@@ -9,6 +9,7 @@ import { ExpandCircleDownRounded } from "@mui/icons-material";
 import { useTable } from "../../hooks/table";
 import { TableNames } from "../../providers/db";
 import { PlanLimitEditor } from "./limitEditor";
+import { CoverageList } from "../../components/CoverageList";
 
 export const EditPlanPage: React.FC = () => {
   const { setTitle } = useAppContext();
@@ -45,31 +46,33 @@ export const EditPlanPage: React.FC = () => {
 
     <TextField fullWidth label="Description" value={plan?.description} onChange={(event) => setPlan(plan => ({ ...plan!, description: event.target.value }))} />
     <TextField fullWidth label="Monthly Premium" type="number" value={plan?.monthlyPremium} onChange={(event) => setPlan(plan => ({ ...plan!, monthlyPremium: Number(event.target.value) }))} />
-    <TextField fullWidth label="Discount" type="number" value={plan?.discount} onChange={(event) => setPlan(plan => ({ ...plan!, discount: Number(event.target.value) }))} />
+    <TextField fullWidth label="Employer Savings Contribution" type="number" value={plan?.discount} onChange={(event) => setPlan(plan => ({ ...plan!, discount: Number(event.target.value) }))} />
 
     <FormControlLabel control={<Switch checked={plan?.isCombinedDeductible} onChange={(event) => setPlan(plan => ({ ...plan!, isCombinedDeductible: event.target.checked }))} />} label="Combined Deductibles" />
     <FormControlLabel control={<Switch checked={plan?.isFamilyPlan} onChange={(event) => setPlan(plan => ({ ...plan!, isFamilyPlan: event.target.checked }))} />} label="Family Plan" />
 
-
-    <Typography variant="h6">Limits</Typography>
-
     <Stack>
       <Accordion>
-        <AccordionSummary expandIcon={<ExpandCircleDownRounded />}>In-Network</AccordionSummary>
+        <AccordionSummary expandIcon={<ExpandCircleDownRounded />}>In-Network Limits</AccordionSummary>
         <AccordionDetails>
           <PlanLimitEditor value={plan.inNetworkLimt} onChange={(inNetworkLimt) => setPlan(plan => ({ ...plan!, inNetworkLimt }))} isFamilyPlan={plan.isFamilyPlan} />
         </AccordionDetails>
       </Accordion>
 
       <Accordion>
-        <AccordionSummary expandIcon={<ExpandCircleDownRounded />}>Out-Of-Network</AccordionSummary>
+        <AccordionSummary expandIcon={<ExpandCircleDownRounded />}>Out-Of-Network Limits</AccordionSummary>
         <AccordionDetails>
           <PlanLimitEditor value={plan.outOfNetworkLimit} onChange={(outNetworkLimt) => setPlan(plan => ({ ...plan!, outOfNetworkLimit: outNetworkLimt }))} isFamilyPlan={plan.isFamilyPlan} />
         </AccordionDetails>
       </Accordion>
-    </Stack>
 
-    <Typography variant="h6">Coverages</Typography>
+      <Accordion defaultExpanded>
+        <AccordionSummary expandIcon={<ExpandCircleDownRounded />}>Coverages</AccordionSummary>
+        <AccordionDetails>
+          <CoverageList planId={plan.id} />
+        </AccordionDetails>
+      </Accordion>
+    </Stack>
 
 
     <Fab onClick={onSave} sx={{ position: 'fixed', bottom: theme.spacing(2), right: theme.spacing(2) }}>

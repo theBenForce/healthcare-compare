@@ -1,27 +1,29 @@
 import React from 'react';
 import { TableNames, useDB } from '../providers/db';
 import { BaseSchema } from '../types/base.dto';
+import { CoverageSchema } from '../types/coverage.dto';
 
+type RecordFilter = Record<string, string | undefined>;
 
 export interface TableContextInterface<SchemaType extends BaseSchema> {
-  list: () => Promise<SchemaType[]>;
-  create: (value: SchemaType) => Promise<string>;
-  get: (planId: string) => Promise<SchemaType | null>;
-  save: (plan: SchemaType) => Promise<void>;
-  remove: (planId: string) => Promise<void>;
+  list: (filter?: RecordFilter) => Promise<SchemaType[]>;
+  get: (id: string) => Promise<SchemaType | null>;
+  save: (value: SchemaType) => Promise<void>;
+  remove: (id: string) => Promise<void>;
   values: SchemaType[];
 }
 
 interface UseTableParams {
   tableName: TableNames;
-  filter?: Record<string, string | undefined>;
+  filter?: RecordFilter;
+  autoRefresh?: boolean;
 }
 
-export const useTable = <TableSchema extends BaseSchema>({ tableName, filter }: UseTableParams): TableContextInterface<TableSchema> => {
+export const useTable = <TableSchema extends BaseSchema | CoverageSchema>({ tableName, filter: baseFilter, autoRefresh }: UseTableParams): TableContextInterface<TableSchema> => {
   const { db } = useDB();
   const [values, setValues] = React.useState<TableSchema[]>([]);
 
-  const list = React.useCallback(async () => {
+  const list = React.useCallback(async (filter: RecordFilter | undefined = baseFilter) => {
     if (!db) return [];
 
     let result;
@@ -30,37 +32,45 @@ export const useTable = <TableSchema extends BaseSchema>({ tableName, filter }: 
 
       if (filterEntries.length > 0) {
         const [index, value] = filterEntries[0];
+        console.info(`Using index ${index} with value ${value} on table ${tableName}`);
         result = await db.getAllFromIndex(tableName, index, value);
       }
     }
     
     if(!result) {
-      result = await db?.getAll(tableName);
+      result = await db?.getAll(tableName).then((values) => values.map(v => ({...v, type: tableName})) || []);
     }
     
     setValues(result);
     return result as Array<TableSchema>;
-  }, [db, tableName, filter]);
+  }, [db, tableName, baseFilter]);
 
-  const create = async (newValue: TableSchema) => {
-    await db?.add(tableName, newValue);
+  const remove = React.useCallback(async (id: string) => {
+    await db?.delete(tableName, id);
+    if(autoRefresh) await list();
+  }, [db, list, tableName, autoRefresh]);
 
-    await list();
+  const get = React.useCallback(async (id: string) => {
+    console.info(`get ${tableName} ${id}`);
+    return db?.get(tableName, id)?.then((value) => ({...value, type: tableName}) || null);
+  }, [db, tableName]);
+  const save = React.useCallback(async (entity: TableSchema) => {
+    if (!db) return;
 
-    return newValue.id;
-  };
+    const existing = await db.getKey(tableName, entity.id);
 
-  const remove = React.useCallback(async (planId: string) => {
-    await db?.delete(tableName, planId);
-    await list();
-  }, [db, list, tableName]);
-
-  const get = React.useCallback(async (planId: string) => db?.get(tableName, planId), [db, tableName]);
-  const save = React.useCallback(async (plan: TableSchema) => { await db?.put(tableName, plan); await list(); }, [db, list, tableName]);
+    if (existing) {
+      await db?.put(tableName, entity);
+    } else {
+      await db?.add(tableName, entity);
+    }
+    
+    if(autoRefresh) await list();
+  }, [db, list, tableName, autoRefresh]);
 
   React.useEffect(() => {
     list();
   }, [list]);
 
-  return { list, create, get, save, remove, values };
+  return { list, get, save, remove, values };
 };

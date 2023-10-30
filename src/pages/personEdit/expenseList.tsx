@@ -8,12 +8,16 @@ import { EditExpenseDialog } from '../../components/dialog/editExpense';
 import { useTable } from '../../hooks/table';
 import { TableNames } from '../../providers/db';
 import { ExpenseSchema } from '../../types/expense.dto';
+import { CategorySchema } from '../../types/category.dto';
+import { useNavigate } from 'react-router-dom';
 
 
 export const ExpenseList: React.FC<{ personId?: string; categoryId?: string }> = ({ personId, categoryId }) => {
   const { values, remove } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES, filter: { personId, categoryId } });
-  const { values: categories } = useTable({ tableName: TableNames.CATEGORIES });
+  const { values: categories } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
+  const { values: people } = useTable({ tableName: TableNames.PEOPLE });
   const [selectedExpense, setSelectedExpense] = React.useState<string | null>(null);
+  const navigate = useNavigate();
 
   const onDelete = (expenseId: string) => () => {
     remove(expenseId);
@@ -22,14 +26,16 @@ export const ExpenseList: React.FC<{ personId?: string; categoryId?: string }> =
   return <><Grid container spacing={2}>
     {values.map(expense => {
       const totalCost = expense.months.length * expense.amount;
-      const categoryName = categories.find(x => x.id === expense.categoryId)?.name ?? 'Unknown';
+      const category = categories.find(x => x.id === expense.categoryId);
+      const person = people.find(x => x.id === expense.personId);
 
       return <Grid key={expense.id} xs={3}><Card>
         <CardHeader
           title={expense.name}
           subheader={`Total Cost: $${totalCost.toFixed(2)}`} />
         <CardContent>
-          <Chip label={categoryName} />
+          {personId && <Chip clickable onClick={() => navigate(`/category/${category?.id}`)} label={category?.name ?? 'Unknown'} color={category?.isInNetwork ? 'primary' : 'secondary'} />}
+          {categoryId && <Chip clickable onClick={() => navigate(`/person/${person?.id}`)} label={person?.name ?? 'Unknown'} />}
         </CardContent>
         <CardActions>
           <IconButton onClick={() => setSelectedExpense(expense.id)}>

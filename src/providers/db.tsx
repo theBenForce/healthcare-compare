@@ -14,6 +14,7 @@ export enum TableNames {
   PEOPLE = 'person',
   CATEGORIES = 'category',
   EXPENSES = 'expense',
+  COVERAGES = 'coverage',
 }
 
 export const useDB = () => React.useContext(DBContext);
@@ -23,8 +24,8 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
 
   React.useEffect(() => {
     console.info(`Initializing DB`);
-    openDB('healthcare-compare', 2, {
-      async upgrade(database, oldVersion, newVersion, transaction) {
+    openDB('healthcare-compare', 3, {
+      async upgrade(database, oldVersion, _newVersion, transaction) {
         console.info(`Upgrading DB`)
         for (const tableName of Object.values(TableNames)) {
           if (!database.objectStoreNames.contains(tableName)) {
@@ -32,6 +33,9 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
 
             if (tableName === TableNames.EXPENSES) {
               table.createIndex('personId', 'personId');
+              table.createIndex('categoryId', 'categoryId');
+            } else if (tableName === TableNames.COVERAGES) {
+              table.createIndex('planId', 'planId');
               table.createIndex('categoryId', 'categoryId');
             }
           }

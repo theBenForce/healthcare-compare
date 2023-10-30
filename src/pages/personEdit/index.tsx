@@ -53,17 +53,18 @@ export const EditPersonPage: React.FC = () => {
     createExpense({
       id: ulid(),
       name: 'New Expense',
-      months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      months: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
       amount: 0,
       personId: personId!,
       categoryId: '',
+      type: TableNames.EXPENSES,
     });
   };
 
   return <Stack spacing={2}>
     <TextField fullWidth label="Name" value={person?.name} onChange={(event) => setPerson(person => ({ ...person, name: event.target.value }))} />
 
-    <Accordion>
+    <Accordion defaultExpanded>
       <AccordionSummary expandIcon={<ExpandCircleDownRounded />}>Expenses</AccordionSummary>
       <AccordionDetails>
         <ExpenseList personId={personId!} />
