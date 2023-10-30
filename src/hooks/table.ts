@@ -3,9 +3,10 @@ import { TableNames, useDB } from '../providers/db';
 import { BaseSchema } from '../types/base.dto';
 import { CoverageSchema } from '../types/coverage.dto';
 
+type RecordFilter = Record<string, string | undefined>;
 
 export interface TableContextInterface<SchemaType extends BaseSchema> {
-  list: () => Promise<SchemaType[]>;
+  list: (filter?: RecordFilter) => Promise<SchemaType[]>;
   get: (id: string) => Promise<SchemaType | null>;
   save: (value: SchemaType) => Promise<void>;
   remove: (id: string) => Promise<void>;
@@ -14,15 +15,15 @@ export interface TableContextInterface<SchemaType extends BaseSchema> {
 
 interface UseTableParams {
   tableName: TableNames;
-  filter?: Record<string, string | undefined>;
+  filter?: RecordFilter;
   autoRefresh?: boolean;
 }
 
-export const useTable = <TableSchema extends BaseSchema | CoverageSchema>({ tableName, filter, autoRefresh }: UseTableParams): TableContextInterface<TableSchema> => {
+export const useTable = <TableSchema extends BaseSchema | CoverageSchema>({ tableName, filter: baseFilter, autoRefresh }: UseTableParams): TableContextInterface<TableSchema> => {
   const { db } = useDB();
   const [values, setValues] = React.useState<TableSchema[]>([]);
 
-  const list = React.useCallback(async () => {
+  const list = React.useCallback(async (filter: RecordFilter | undefined = baseFilter) => {
     if (!db) return [];
 
     let result;
@@ -31,6 +32,7 @@ export const useTable = <TableSchema extends BaseSchema | CoverageSchema>({ tabl
 
       if (filterEntries.length > 0) {
         const [index, value] = filterEntries[0];
+        console.info(`Using index ${index} with value ${value} on table ${tableName}`);
         result = await db.getAllFromIndex(tableName, index, value);
       }
     }
@@ -41,7 +43,7 @@ export const useTable = <TableSchema extends BaseSchema | CoverageSchema>({ tabl
     
     setValues(result);
     return result as Array<TableSchema>;
-  }, [db, tableName, filter]);
+  }, [db, tableName, baseFilter]);
 
   const remove = React.useCallback(async (id: string) => {
     await db?.delete(tableName, id);
