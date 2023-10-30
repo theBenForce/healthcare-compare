@@ -3,14 +3,16 @@ import { useAppContext } from '../providers/state';
 import { Stack, Typography } from '@mui/material';
 import { useCostReport } from '../hooks/costReport';
 import { BarChart } from '@mui/x-charts/BarChart';
+import { useTranslation } from 'react-i18next';
 
 export const SummaryPage: React.FC = () => {
   const { setTitle } = useAppContext();
   const report = useCostReport();
+  const { t } = useTranslation();
 
   React.useEffect(() => {
-    setTitle('Healthcare Compare');
-  }, [setTitle]);
+    setTitle(t('summary.title'));
+  }, [setTitle, t]);
 
   return <Stack spacing={2}>
     {Boolean(report.length) && <><Typography variant="h6">Summary</Typography>
@@ -19,8 +21,7 @@ export const SummaryPage: React.FC = () => {
         series={[{ data: report?.map(({ premiums }) => premiums) ?? [] }]}
         height={500}
       /></>}
-    <Typography variant="h6">About</Typography>
-    <Typography variant="body1">Welcome to Healthcare Compared. This site was built to provide a simple
-      way to compare insurance plans each year.</Typography>
+    <Typography variant="h6">{t('summary.about.title')}</Typography>
+    <Typography variant="body1">{t('summary.about.content')}</Typography>
   </Stack>;
 };
