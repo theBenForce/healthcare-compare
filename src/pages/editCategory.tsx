@@ -61,6 +61,7 @@ export const EditCategoryPage: React.FC = () => {
 
   return <Stack spacing={2}>
     <TextField fullWidth label="Name" value={category.name} onChange={(event) => setCategory(value => ({ ...value!, name: event.target.value }))} />
+    <TextField fullWidth label="Description" value={category.description} onChange={(event) => setCategory(value => ({ ...value!, description: event.target.value }))} />
 
     <Stack>
       <Accordion>
