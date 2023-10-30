@@ -1,10 +1,9 @@
 import React from 'react';
 import { useTable } from './table';
 import { CoverageSchema } from '../types/coverage.dto';
-import { TableNames } from '../providers/db';
+import { TableNames, useDB } from '../providers/db';
 import { PlanSchema } from '../types/plan.dto';
 import { CategorySchema } from '../types/category.dto';
-import { ulid } from 'ulidx';
 
 interface UseCoveragesParams {
   planId?: string;
@@ -18,48 +17,33 @@ export const useCoverages = ({planId, categoryId}: UseCoveragesParams) => {
   const { values: plans } = useTable<PlanSchema>({ tableName: TableNames.PLANS });
   const { values: categories } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
   
-  React.useEffect(() => {
+  const refresh = React.useCallback(() => {
+    console.info(`Refreshing coverages for planId: ${planId} and categoryId: ${categoryId}`);
+
     const result = [...values];
     if (planId) {
-      const missingCategories = categories.filter(c => !result.find(r => r.categoryId === c.id));
-      missingCategories.forEach(c => {
-        result.push({
-          id: ulid(),
+      const missingCategories = categories.filter(c => !result.find(r => r.categoryId === c.id)).map(c => CoverageSchema.parse({
+          id: [planId, c.id].join('#'),
           planId,
           categoryId: c.id,
-          beforeDeductible: {
-            type: 'copay',
-            amount: 0,
-          },
-          afterDeductible: {
-            type: 'copay',
-            amount: 0,
-          },
-          type: TableNames.COVERAGES,
-        });
-      });
+      }));
+      result.push(...missingCategories);
     } else if (categoryId) {
-      const missingPlans = plans.filter(p => !result.find(r => r.planId === p.id));
-      missingPlans.forEach(p => {
-        result.push({
-          id: ulid(),
+      const missingPlans = plans.filter(p => !result.find(r => r.planId === p.id)).map(p => CoverageSchema.parse({
+          id: [p.id, categoryId].join('#'),
           planId: p.id,
           categoryId,
-          beforeDeductible: {
-            type: 'copay',
-            amount: 0,
-          },
-          afterDeductible: {
-            type: 'copay',
-            amount: 0,
-          },
-          type: TableNames.COVERAGES,
-        });
-      });
+      }));
+      result.push(...missingPlans);
     }
-
+    
     setCoverages(result);
   }, [planId, categoryId, values, categories, plans]);
   
-  return coverages;
+  React.useEffect(() => {
+    if (coverages.length) return;
+    refresh();
+  }, [planId, categoryId, values, categories, plans, coverages, refresh]);
+  
+  return {coverages, refresh};
 }
