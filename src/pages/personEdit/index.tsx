@@ -18,7 +18,7 @@ import { ExpandCircleDownRounded } from '@mui/icons-material';
 export const EditPersonPage: React.FC = () => {
   const { get, save } = useTable<PersonSchema>({ tableName: TableNames.PEOPLE });
   const { personId } = useParams();
-  const { create: createExpense } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES });
+  const { save: createExpense } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES });
 
   const [person, setPerson] = React.useState<PersonSchema | null>(null);
   const { setTitle } = useAppContext();
@@ -62,7 +62,7 @@ export const EditPersonPage: React.FC = () => {
   };
 
   return <Stack spacing={2}>
-    <TextField fullWidth label="Name" value={person?.name} onChange={(event) => setPerson(person => ({ ...person, name: event.target.value }))} />
+    <TextField fullWidth label="Name" value={person?.name} onChange={(event) => setPerson(person => ({ ...person!, name: event.target.value }))} />
 
     <Accordion defaultExpanded>
       <AccordionSummary expandIcon={<ExpandCircleDownRounded />}>Expenses</AccordionSummary>

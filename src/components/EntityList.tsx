@@ -17,7 +17,7 @@ interface EntityListParams {
 }
 
 export const EntityList: React.FC<EntityListParams> = ({ table, title }) => {
-  const { values, create } = useTable<BaseSchema>({ tableName: table });
+  const { values, save } = useTable<BaseSchema>({ tableName: table });
   const theme = useTheme();
   const navigate = useNavigate();
   const { setTitle } = useAppContext();
@@ -27,7 +27,7 @@ export const EntityList: React.FC<EntityListParams> = ({ table, title }) => {
   }, [setTitle, title]);
 
   const onCreate = async () => {
-    const id = await create({
+    const id = await save({
       id: ulid(),
       name: `New ${table}`,
       type: table,
