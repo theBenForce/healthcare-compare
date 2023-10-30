@@ -27,8 +27,9 @@ export const EntityList: React.FC<EntityListParams> = ({ table, title }) => {
   }, [setTitle, title]);
 
   const onCreate = async () => {
-    const id = await save({
-      id: ulid(),
+    const id = ulid();
+    await save({
+      id,
       name: `New ${table}`,
       type: table,
     });
