@@ -3,6 +3,7 @@ import { TableNames } from '../providers/db';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useTable } from '../hooks/table';
+import { BaseSchema } from '../types/base.dto';
 
 interface EntitySelectorParams {
   value: string;
@@ -13,7 +14,7 @@ interface EntitySelectorParams {
 
 
 export const EntitySelector: React.FC<EntitySelectorParams> = ({ value, onChange, table, label }) => {
-  const { values } = useTable({ tableName: table });
+  const { values } = useTable<BaseSchema>({ tableName: table });
 
   return <Autocomplete
     renderInput={(params) => <TextField {...params} label={label} />}

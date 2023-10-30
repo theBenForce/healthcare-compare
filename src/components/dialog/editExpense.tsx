@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { Autocomplete, Button, DialogActions, DialogContent, DialogTitle, FormControlLabel, LinearProgress, Stack, Switch, TextField } from '@mui/material';
+import { Button, DialogActions, DialogContent, DialogTitle, LinearProgress, Stack, TextField } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import { useTable } from '../../hooks/table';
 import { TableNames } from '../../providers/db';
 import { ExpenseSchema } from '../../types/expense.dto';
 import { DollarField } from '../DollarField';
-import { MonthSelector } from '../MonthSelector';
 import { EntitySelector } from '../EntitySelector';
+import { MonthSelector } from '../MonthSelector';
 
 
 interface EditExpenseDialogProps {

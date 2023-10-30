@@ -5,7 +5,7 @@ import { CoverageSchema } from '../types/coverage.dto';
 
 type RecordFilter = Record<string, string | undefined>;
 
-export interface TableContextInterface<SchemaType extends BaseSchema> {
+export interface TableContextInterface<SchemaType extends BaseSchema | CoverageSchema> {
   list: (filter?: RecordFilter) => Promise<SchemaType[]>;
   get: (id: string) => Promise<SchemaType | null>;
   save: (value: SchemaType) => Promise<void>;

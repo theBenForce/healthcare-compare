@@ -13,11 +13,14 @@ export const SummaryPage: React.FC = () => {
   }, [setTitle]);
 
   return <Stack spacing={2}>
-    <Typography variant="h6">Summary</Typography>
-    <BarChart
-      xAxis={[{ scaleType: 'band', data: report?.map(({ name }) => name) ?? [] }]}
-      series={[{ data: report?.map(({ premiums }) => premiums) ?? [] }]}
-      height={500}
-    />
+    {Boolean(report.length) && <><Typography variant="h6">Summary</Typography>
+      <BarChart
+        xAxis={[{ scaleType: 'band', data: report?.map(({ name }) => name) ?? [] }]}
+        series={[{ data: report?.map(({ premiums }) => premiums) ?? [] }]}
+        height={500}
+      /></>}
+    <Typography variant="h6">About</Typography>
+    <Typography variant="body1">Welcome to Healthcare Compared. This site was built to provide a simple
+      way to compare insurance plans each year.</Typography>
   </Stack>;
 };

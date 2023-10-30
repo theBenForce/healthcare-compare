@@ -41,7 +41,6 @@ const CategoryOverview: React.FC<{ category: CategorySchema }> = ({ category }) 
 
   return <Paper elevation={0} sx={{ flexWrap: 'wrap' }}>
     <Chip label={`Expenses: ${total.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`} />
-    <Chip label={category.isInNetwork ? 'In Network' : 'Out of Network'} color='secondary' />
   </Paper>;
 };
 
@@ -56,7 +55,7 @@ const PersonOverview: React.FC<{ person: PersonSchema }> = ({ person }) => {
 };
 
 export const EntityCard: React.FC<EntityCardParams> = ({ table, entityId }) => {
-  const { get, remove } = useTable({ tableName: table });
+  const { get, remove } = useTable<BaseSchema>({ tableName: table });
   const [value, setValue] = React.useState<BaseSchema | null>(null);
   const navigate = useNavigate();
 

@@ -10,12 +10,13 @@ import { TableNames } from '../../providers/db';
 import { ExpenseSchema } from '../../types/expense.dto';
 import { CategorySchema } from '../../types/category.dto';
 import { useNavigate } from 'react-router-dom';
+import { PersonSchema } from '../../types/person.dto';
 
 
 export const ExpenseList: React.FC<{ personId?: string; categoryId?: string }> = ({ personId, categoryId }) => {
   const { values, remove } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES, filter: { personId, categoryId } });
   const { values: categories } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
-  const { values: people } = useTable({ tableName: TableNames.PEOPLE });
+  const { values: people } = useTable<PersonSchema>({ tableName: TableNames.PEOPLE });
   const [selectedExpense, setSelectedExpense] = React.useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -34,7 +35,7 @@ export const ExpenseList: React.FC<{ personId?: string; categoryId?: string }> =
           title={expense.name}
           subheader={`Total Cost: $${totalCost.toFixed(2)}`} />
         <CardContent>
-          {personId && <Chip clickable onClick={() => navigate(`/category/${category?.id}`)} label={category?.name ?? 'Unknown'} color={category?.isInNetwork ? 'primary' : 'secondary'} />}
+          {personId && <Chip clickable onClick={() => navigate(`/category/${category?.id}`)} label={category?.name ?? 'Unknown'} />}
           {categoryId && <Chip clickable onClick={() => navigate(`/person/${person?.id}`)} label={person?.name ?? 'Unknown'} />}
         </CardContent>
         <CardActions>
