@@ -4,23 +4,60 @@ import { Stack, Typography } from '@mui/material';
 import { useCostReport } from '../hooks/costReport';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { useTranslation } from 'react-i18next';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 export const SummaryPage: React.FC = () => {
   const { setTitle } = useAppContext();
   const report = useCostReport();
   const { t } = useTranslation();
 
+  const columns = React.useMemo<Array<GridColDef>>(() => [
+    {
+      field: 'name',
+      headerName: 'Plan',
+      flex: 3,
+    },
+    {
+      field: 'premiums',
+      headerName: 'Premiums',
+      flex: 1,
+      type: 'number',
+      valueFormatter: params => `$` + params.value.toFixed(2),
+    },
+    {
+      field: 'expenses',
+      headerName: 'Expenses',
+      flex: 1,
+      type: 'number',
+      valueFormatter: params => `$` + params.value.toFixed(2),
+    },
+    {
+      field: 'total',
+      headerName: 'Total',
+      flex: 1,
+      type: 'number',
+      valueGetter: params => params.row.premiums + params.row.expenses,
+      valueFormatter: params => `$` + params.value.toFixed(2),
+    },
+  ], []);
+
   React.useEffect(() => {
     setTitle(t('summary.title'));
   }, [setTitle, t]);
 
   return <Stack spacing={2}>
-    {Boolean(report.length) && <><Typography variant="h6">Summary</Typography>
+    {Boolean(report.length) && <>
       <BarChart
         xAxis={[{ scaleType: 'band', data: report?.map(({ name }) => name) ?? [] }]}
         series={[{ data: report?.map(({ premiums }) => premiums) ?? [] }]}
         height={500}
-      /></>}
+      />
+      <DataGrid
+        rows={report}
+        getRowId={row => row.planId}
+        columns={columns}
+      />
+    </>}
     <Typography variant="h6">{t('summary.about.title')}</Typography>
     <Typography variant="body1">{t('summary.about.content')}</Typography>
   </Stack>;
