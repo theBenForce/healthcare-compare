@@ -32,9 +32,9 @@ export const CoverageEditor: React.FC<CoverageEditorProps> = ({ value, onChange 
         <MenuItem value='copay'>Copay</MenuItem>
         <MenuItem value='percent'>Percent</MenuItem>
       </Select>
-
-      <TextField sx={{ flex: 1 }} label="Amount" type="number" value={value.amount} onChange={(event) => onChange({ ...value, amount: parseFloat(event.target.value) })} />
     </FormControl>
+
+    <TextField sx={{ flex: 1 }} label="Amount" type="number" value={value.amount} onChange={(event) => onChange({ ...value, amount: parseFloat(event.target.value) })} />
   </Stack>;
 };
 

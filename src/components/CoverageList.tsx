@@ -64,34 +64,6 @@ const columnGroupingModel: GridColumnGroupingModel = [
   },
 ];
 
-// interface EditToolbarProps {
-//   planId?: string;
-//   categoryId?: string;
-//   changes: Array<CoverageSchema>;
-//   clearChanges: () => void;
-// }
-
-// const EditToolbar: React.FC<EditToolbarProps> = ({ changes, clearChanges }) => {
-//   const { save } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES });
-
-//   const onSaveChanges = async () => {
-//     console.dir({ changes });
-//     await Promise.all(changes.map(async (change) => {
-//       await save(change);
-//     }));
-
-//     clearChanges();
-//   }
-
-//   return (
-//     <GridToolbarContainer>
-//       <Button color="primary" disabled={changes.length === 0} startIcon={<SaveIcon />} onClick={onSaveChanges}>
-//         Save Changes
-//       </Button>
-//     </GridToolbarContainer>
-//   );
-// }
-
 export const CoverageList: React.FC<CoverageListParams> = ({ planId, categoryId }) => {
   const { remove, save } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES });
   const { coverages, refresh } = useCoverages({ planId, categoryId });
@@ -108,7 +80,7 @@ export const CoverageList: React.FC<CoverageListParams> = ({ planId, categoryId 
   }, [save, refresh]);
 
   const columnDefs = React.useMemo(() => {
-    let result = columns;
+    let result = [...columns];
     if (planId) {
       result = result.filter(x => x.field !== 'planId');
     } else if (categoryId) {
