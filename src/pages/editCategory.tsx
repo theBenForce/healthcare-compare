@@ -1,5 +1,5 @@
 import { Accordion, AccordionDetails, AccordionSummary, Fab, LinearProgress, Stack, TextField, Typography, useTheme } from '@mui/material';
-import React from 'react';
+import React, { useTransition } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppContext } from '../providers/state';
 
@@ -14,6 +14,8 @@ import { CategorySchema } from '../types/category.dto';
 import { ExpenseSchema } from '../types/expense.dto';
 import { ExpenseList } from './personEdit/expenseList';
 
+import { useTranslation } from 'react-i18next';
+
 export const EditCategoryPage: React.FC = () => {
   const { get, save } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
   const { id } = useParams();
@@ -22,10 +24,11 @@ export const EditCategoryPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const { save: createExpense } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES });
+  const { t } = useTranslation();
 
   React.useEffect(() => {
-    setTitle('Edit Person');
-  }, [setTitle]);
+    setTitle(t('editCategory.title'));
+  }, [setTitle, t]);
 
   React.useEffect(() => {
     if (!id) return;
@@ -36,7 +39,7 @@ export const EditCategoryPage: React.FC = () => {
 
   if (!category) {
     return <Stack spacing={2}>
-      <Typography variant="h6">Loading...</Typography>
+      <Typography variant="h6">{`${t('loading')}...`}</Typography>
       <LinearProgress />
     </Stack>;
   }

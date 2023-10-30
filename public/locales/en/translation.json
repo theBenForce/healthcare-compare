@@ -5,5 +5,9 @@
       "title": "About",
       "content": "Welcome to Healthcare Compared. This site was built to provide a simple way to compare insurance plans each year."
     }
-  }
+  },
+  "editCategory": {
+    "title": "Edit Category",
+  },
+  "loading": "Loading"
 }
