@@ -1,18 +1,18 @@
+import { Accordion, AccordionDetails, AccordionSummary, Fab, LinearProgress, Stack, TextField, Typography, useTheme } from '@mui/material';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Accordion, AccordionDetails, AccordionSummary, Fab, FormControlLabel, LinearProgress, Stack, Switch, TextField, Typography, useTheme } from '@mui/material';
 import { useAppContext } from '../providers/state';
 
-import SaveIcon from "@mui/icons-material/SaveRounded";
-import { useTable } from '../hooks/table';
-import { CategorySchema } from '../types/category.dto';
-import { TableNames } from '../providers/db';
 import { ExpandCircleDownRounded } from '@mui/icons-material';
-import { ExpenseList } from './personEdit/expenseList';
-import { ulid } from 'ulidx';
-import { ExpenseSchema } from '../types/expense.dto';
 import ExpenseIcon from "@mui/icons-material/AttachMoneyRounded";
+import SaveIcon from "@mui/icons-material/SaveRounded";
+import { ulid } from 'ulidx';
 import { CoverageList } from '../components/CoverageList';
+import { useTable } from '../hooks/table';
+import { TableNames } from '../providers/db';
+import { CategorySchema } from '../types/category.dto';
+import { ExpenseSchema } from '../types/expense.dto';
+import { ExpenseList } from './personEdit/expenseList';
 
 export const EditCategoryPage: React.FC = () => {
   const { get, save } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
@@ -21,7 +21,7 @@ export const EditCategoryPage: React.FC = () => {
   const { setTitle } = useAppContext();
   const theme = useTheme();
   const navigate = useNavigate();
-  const { create: createExpense } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES });
+  const { save: createExpense } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES });
 
   React.useEffect(() => {
     setTitle('Edit Person');
@@ -61,8 +61,6 @@ export const EditCategoryPage: React.FC = () => {
 
   return <Stack spacing={2}>
     <TextField fullWidth label="Name" value={category.name} onChange={(event) => setCategory(value => ({ ...value!, name: event.target.value }))} />
-
-    <FormControlLabel control={<Switch checked={category?.isInNetwork} onChange={(event) => setCategory(value => ({ ...value!, isInNetwork: event.target.checked }))} />} label="In-Network" />
 
     <Stack>
       <Accordion>

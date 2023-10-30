@@ -4,6 +4,7 @@ import { CoverageSchema } from '../types/coverage.dto';
 import { TableNames, useDB } from '../providers/db';
 import { PlanSchema } from '../types/plan.dto';
 import { CategorySchema } from '../types/category.dto';
+import { ulid } from 'ulidx';
 
 interface UseCoveragesParams {
   planId?: string;
@@ -13,24 +14,26 @@ interface UseCoveragesParams {
 
 export const useCoverages = ({planId, categoryId}: UseCoveragesParams) => {
   const [coverages, setCoverages] = React.useState<Array<CoverageSchema>>([]);
-  const { values } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES, filter: { planId, categoryId } });
-  const { values: plans } = useTable<PlanSchema>({ tableName: TableNames.PLANS });
-  const { values: categories } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
+  const { list: listCoverages } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES, filter: { planId, categoryId } });
+  const { list: listPlans } = useTable<PlanSchema>({ tableName: TableNames.PLANS });
+  const { list: listCategories } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
   
-  const refresh = React.useCallback(() => {
+  const refresh = React.useCallback(async () => {
     console.info(`Refreshing coverages for planId: ${planId} and categoryId: ${categoryId}`);
 
-    const result = [...values];
+    const result = await listCoverages();
     if (planId) {
+      const categories = await listCategories();
       const missingCategories = categories.filter(c => !result.find(r => r.categoryId === c.id)).map(c => CoverageSchema.parse({
-          id: [planId, c.id].join('#'),
+          id: ulid(),
           planId,
           categoryId: c.id,
       }));
       result.push(...missingCategories);
     } else if (categoryId) {
+      const plans = await listPlans();
       const missingPlans = plans.filter(p => !result.find(r => r.planId === p.id)).map(p => CoverageSchema.parse({
-          id: [p.id, categoryId].join('#'),
+          id: ulid(),
           planId: p.id,
           categoryId,
       }));
@@ -38,12 +41,12 @@ export const useCoverages = ({planId, categoryId}: UseCoveragesParams) => {
     }
     
     setCoverages(result);
-  }, [planId, categoryId, values, categories, plans]);
+  }, [planId, categoryId, listCoverages, listCategories, listPlans]);
   
   React.useEffect(() => {
     if (coverages.length) return;
     refresh();
-  }, [planId, categoryId, values, categories, plans, coverages, refresh]);
+  }, [planId, categoryId, coverages, refresh]);
   
   return {coverages, refresh};
 }

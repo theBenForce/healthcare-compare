@@ -19,6 +19,7 @@ export const CoverageSchema = z.object({
   id: z.string().default(''),
   planId: z.string().ulid(),
   categoryId: z.string().ulid(),
+  isInNetwork: z.boolean().optional(),
   beforeDeductible: CoverageValue.default(CoverageValue.parse({})),
   afterDeductible: CoverageValue.default(CoverageValue.parse({})),
   type: z.literal(TableNames.COVERAGES).default(TableNames.COVERAGES),

@@ -34,8 +34,9 @@ const TypeColumnProps = {
 };
 
 const columns: GridColDef[] = [
-  { field: 'planId', headerName: 'Plan', flex: 3, type: 'singleSelect', editable: true },
-  { field: 'categoryId', headerName: 'Category', flex: 3, type: 'singleSelect', editable: true },
+  { field: 'planId', headerName: 'Plan', flex: 3, type: 'singleSelect', editable: false },
+  { field: 'categoryId', headerName: 'Category', flex: 3, type: 'singleSelect', editable: false },
+  { field: 'isInNetwork', headerName: 'In Network', flex: 1, type: 'boolean', editable: true },
   {
     ...TypeColumnProps,
     field: 'beforeDeductible.type',
@@ -66,44 +67,36 @@ const columnGroupingModel: GridColumnGroupingModel = [
   },
 ];
 
-interface EditToolbarProps {
-  planId?: string;
-  categoryId?: string;
-  changes: Array<CoverageSchema>;
-  clearChanges: () => void;
-}
+// interface EditToolbarProps {
+//   planId?: string;
+//   categoryId?: string;
+//   changes: Array<CoverageSchema>;
+//   clearChanges: () => void;
+// }
 
-const EditToolbar: React.FC<EditToolbarProps> = ({ changes, clearChanges }) => {
-  const { create, save } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES });
+// const EditToolbar: React.FC<EditToolbarProps> = ({ changes, clearChanges }) => {
+//   const { save } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES });
 
-  const onSaveChanges = async () => {
-    console.dir({ changes });
-    await Promise.all(changes.map(async (change) => {
+//   const onSaveChanges = async () => {
+//     console.dir({ changes });
+//     await Promise.all(changes.map(async (change) => {
+//       await save(change);
+//     }));
 
-      if (change.id.includes('#')) {
-        await create({
-          ...change,
-          id: ulid(),
-        });
-      } else {
-        await save(change);
-      }
-    }));
+//     clearChanges();
+//   }
 
-    clearChanges();
-  }
-
-  return (
-    <GridToolbarContainer>
-      <Button color="primary" disabled={changes.length === 0} startIcon={<SaveIcon />} onClick={onSaveChanges}>
-        Save Changes
-      </Button>
-    </GridToolbarContainer>
-  );
-}
+//   return (
+//     <GridToolbarContainer>
+//       <Button color="primary" disabled={changes.length === 0} startIcon={<SaveIcon />} onClick={onSaveChanges}>
+//         Save Changes
+//       </Button>
+//     </GridToolbarContainer>
+//   );
+// }
 
 export const CoverageList: React.FC<CoverageListParams> = ({ planId, categoryId }) => {
-  const { remove, save, create } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES });
+  const { remove, save } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES });
   const { coverages, refresh } = useCoverages({ planId, categoryId });
   const [editingCoverageId, setEditingCoverageId] = React.useState<string | null>(null);
 
@@ -148,10 +141,7 @@ export const CoverageList: React.FC<CoverageListParams> = ({ planId, categoryId 
           <GridActionsCellItem icon={<EditIcon />} onClick={async () => {
             const coverage = CoverageSchema.parse(params.row);
 
-            if (coverage.id.includes('#')) {
-              const newId = await create(CoverageSchema.parse({ ...params.row, id: ulid() }));
-              coverage.id = newId;
-            }
+            await save(coverage);
             return setEditingCoverageId(coverage.id);
           }
           } label="Edit" />,
@@ -161,7 +151,7 @@ export const CoverageList: React.FC<CoverageListParams> = ({ planId, categoryId 
     });
 
     return result;
-  }, [planId, categoryId, plans, categories, remove, create]);
+  }, [planId, categoryId, plans, categories, save, remove]);
 
   return <><DataGrid
     // editMode='row'

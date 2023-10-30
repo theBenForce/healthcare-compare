@@ -6,7 +6,6 @@ import { CoverageSchema } from '../types/coverage.dto';
 
 export interface TableContextInterface<SchemaType extends BaseSchema> {
   list: () => Promise<SchemaType[]>;
-  create: (value: SchemaType) => Promise<string>;
   get: (id: string) => Promise<SchemaType | null>;
   save: (value: SchemaType) => Promise<void>;
   remove: (id: string) => Promise<void>;
@@ -16,9 +15,10 @@ export interface TableContextInterface<SchemaType extends BaseSchema> {
 interface UseTableParams {
   tableName: TableNames;
   filter?: Record<string, string | undefined>;
+  autoRefresh?: boolean;
 }
 
-export const useTable = <TableSchema extends BaseSchema | CoverageSchema>({ tableName, filter }: UseTableParams): TableContextInterface<TableSchema> => {
+export const useTable = <TableSchema extends BaseSchema | CoverageSchema>({ tableName, filter, autoRefresh }: UseTableParams): TableContextInterface<TableSchema> => {
   const { db } = useDB();
   const [values, setValues] = React.useState<TableSchema[]>([]);
 
@@ -43,31 +43,32 @@ export const useTable = <TableSchema extends BaseSchema | CoverageSchema>({ tabl
     return result as Array<TableSchema>;
   }, [db, tableName, filter]);
 
-  const create = async (value: TableSchema) => {
-    await db?.add(tableName, value);
-
-    await list();
-
-    return value.id;
-  };
-
   const remove = React.useCallback(async (id: string) => {
     await db?.delete(tableName, id);
-    await list();
-  }, [db, list, tableName]);
+    if(autoRefresh) await list();
+  }, [db, list, tableName, autoRefresh]);
 
   const get = React.useCallback(async (id: string) => {
     console.info(`get ${tableName} ${id}`);
     return db?.get(tableName, id)?.then((value) => ({...value, type: tableName}) || null);
   }, [db, tableName]);
   const save = React.useCallback(async (entity: TableSchema) => {
-    await db?.put(tableName, entity);
-    await list();
-  }, [db, list, tableName]);
+    if (!db) return;
+
+    const existing = await db.getKey(tableName, entity.id);
+
+    if (existing) {
+      await db?.put(tableName, entity);
+    } else {
+      await db?.add(tableName, entity);
+    }
+    
+    if(autoRefresh) await list();
+  }, [db, list, tableName, autoRefresh]);
 
   React.useEffect(() => {
     list();
   }, [list]);
 
-  return { list, create, get, save, remove, values };
+  return { list, get, save, remove, values };
 };
