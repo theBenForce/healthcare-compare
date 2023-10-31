@@ -20,13 +20,32 @@ import { EditCategoryPage } from './pages/editCategory';
 import { EditPersonPage } from './pages/personEdit';
 import { EditPlanPage } from './pages/editPlan';
 import { SummaryPage } from './pages/summary';
-import { TableNames } from './providers/db';
+import { TableNames, useDB } from './providers/db';
 import { useAppContext } from './providers/state';
+import { DownloadRounded } from '@mui/icons-material';
 
 
 function App() {
   const [isDrawerOpen, setDrawerOpen] = React.useState(false);
   const { title } = useAppContext();
+  const { db } = useDB();
+
+  const downloadConfig = async () => {
+    const storeNames = db?.objectStoreNames ?? [];
+    const config = {} as Record<string, Array<unknown>>;
+
+    for (const storeName of storeNames) {
+      const data = await db?.getAll(storeName);
+      config[storeName] = data ?? [];
+    }
+
+    const configBlob = new Blob([JSON.stringify(config)], { type: 'application/json' });
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(configBlob);
+    link.download = 'healthcare-compare.json';
+    link.click();
+  }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw' }}>
@@ -42,6 +61,9 @@ function App() {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'left' }}>{title}</Typography>
+            <IconButton color='inherit' onClick={downloadConfig}>
+              <DownloadRounded />
+            </IconButton>
           </Toolbar>
         </AppBar>
 
