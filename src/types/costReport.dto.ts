@@ -6,6 +6,7 @@ export const ReportPlan = z.object({
   expenses: z.number(),
   discount: z.number().default(0),
   premiums: z.number(),
+  total: z.number()
 });
 
 export type ReportPlan = z.infer<typeof ReportPlan>;
