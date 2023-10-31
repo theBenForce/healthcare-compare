@@ -56,7 +56,7 @@ export const SummaryPage: React.FC = () => {
     {Boolean(report.length) && <>
       <BarChart
         xAxis={[{ scaleType: 'band', data: report?.map(({ name }) => name) ?? [] }]}
-        series={[{ data: report?.map(({ total }) => total) ?? [], color: theme.palette.primary.main }]}
+        series={[{ data: report?.map(({ total }) => total) ?? [], color: theme.palette.secondary.main }]}
         height={500}
       />
       <DataGrid
