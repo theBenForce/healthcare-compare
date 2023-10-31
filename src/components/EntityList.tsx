@@ -40,7 +40,7 @@ export const EntityList: React.FC<EntityListParams> = ({ table, title }) => {
   return <Grid container spacing={2}>
     {values.map(value => <EntityCard key={value.id} table={table} entityId={value.id} />)}
 
-    <Fab onClick={onCreate} sx={{ position: 'fixed', bottom: theme.spacing(2), right: theme.spacing(2) }}>
+    <Fab color='primary' onClick={onCreate} sx={{ position: 'fixed', bottom: theme.spacing(2), right: theme.spacing(2) }}>
       <AddIcon />
     </Fab>
   </Grid>;

@@ -72,10 +72,10 @@ export const EditPersonPage: React.FC = () => {
     </Accordion>
 
     <Stack spacing={2} sx={{ position: 'fixed', bottom: theme.spacing(2), right: theme.spacing(2), alignItems: 'center' }}>
-      <Fab size='small' onClick={onAddExpense}>
+      <Fab color='secondary' size='small' onClick={onAddExpense}>
         <ExpenseIcon />
       </Fab>
-      <Fab onClick={onSave}>
+      <Fab color='primary' onClick={onSave}>
         <SaveIcon />
       </Fab>
     </Stack>

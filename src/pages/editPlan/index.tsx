@@ -75,7 +75,7 @@ export const EditPlanPage: React.FC = () => {
     </Stack>
 
 
-    <Fab onClick={onSave} sx={{ position: 'fixed', bottom: theme.spacing(2), right: theme.spacing(2) }}>
+    <Fab color='primary' onClick={onSave} sx={{ position: 'fixed', bottom: theme.spacing(2), right: theme.spacing(2) }}>
       <SaveIcon />
     </Fab>
   </Stack>

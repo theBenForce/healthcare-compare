@@ -5,7 +5,7 @@ import { WithDB } from './providers/db.tsx'
 import CssBaseline from '@mui/material/CssBaseline';
 import { WithAppContext } from './providers/state.tsx';
 import * as Sentry from "@sentry/react";
-import theme from './theme.tsx';
+import theme from './theme';
 import './i18n.ts';
 import { ThemeProvider } from '@mui/material';
 
