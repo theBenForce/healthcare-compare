@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppContext } from '../providers/state';
-import { Stack, Typography } from '@mui/material';
+import { Stack, Typography, useTheme } from '@mui/material';
 import { useCostReport } from '../hooks/costReport';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ export const SummaryPage: React.FC = () => {
   const { setTitle } = useAppContext();
   const report = useCostReport();
   const { t } = useTranslation();
+  const theme = useTheme();
 
   const columns = React.useMemo<Array<GridColDef>>(() => [
     {
@@ -55,7 +56,7 @@ export const SummaryPage: React.FC = () => {
     {Boolean(report.length) && <>
       <BarChart
         xAxis={[{ scaleType: 'band', data: report?.map(({ name }) => name) ?? [] }]}
-        series={[{ data: report?.map(({ total }) => total) ?? [] }]}
+        series={[{ data: report?.map(({ total }) => total) ?? [], color: theme.palette.primary.main }]}
         height={500}
       />
       <DataGrid
