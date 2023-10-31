@@ -4,6 +4,7 @@ export const ReportPlan = z.object({
   planId: z.string().ulid(),
   name: z.string(),
   expenses: z.number(),
+  discount: z.number().default(0),
   premiums: z.number(),
 });
 
