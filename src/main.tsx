@@ -5,6 +5,9 @@ import { WithDB } from './providers/db.tsx'
 import CssBaseline from '@mui/material/CssBaseline';
 import { WithAppContext } from './providers/state.tsx';
 import * as Sentry from "@sentry/react";
+import theme from './theme.tsx';
+import './i18n.ts';
+import { ThemeProvider } from '@mui/material';
 
 Sentry.init({
   dsn: "https://070b10feac720ac4e210b8beb5b88fc0@o467164.ingest.sentry.io/4506141410000896",
@@ -22,16 +25,17 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
 });
 
-import './i18n.ts';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <WithAppContext>
-      <CssBaseline>
-        <WithDB>
-          <App />
-        </WithDB>
-      </CssBaseline>
+      <ThemeProvider theme={theme}>
+        <CssBaseline>
+          <WithDB>
+            <App />
+          </WithDB>
+        </CssBaseline>
+      </ThemeProvider>
     </WithAppContext>
   </React.StrictMode>,
 )
