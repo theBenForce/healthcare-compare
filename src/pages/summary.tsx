@@ -32,11 +32,17 @@ export const SummaryPage: React.FC = () => {
       valueFormatter: params => `$` + params.value.toFixed(2),
     },
     {
+      field: 'discount',
+      headerName: 'Discount',
+      flex: 1,
+      type: 'number',
+      valueFormatter: params => `$` + params.value.toFixed(2),
+    },
+    {
       field: 'total',
       headerName: 'Total',
       flex: 1,
       type: 'number',
-      valueGetter: params => params.row.premiums + params.row.expenses,
       valueFormatter: params => `$` + params.value.toFixed(2),
     },
   ], []);
@@ -49,7 +55,7 @@ export const SummaryPage: React.FC = () => {
     {Boolean(report.length) && <>
       <BarChart
         xAxis={[{ scaleType: 'band', data: report?.map(({ name }) => name) ?? [] }]}
-        series={[{ data: report?.map(({ premiums }) => premiums) ?? [] }]}
+        series={[{ data: report?.map(({ total }) => total) ?? [] }]}
         height={500}
       />
       <DataGrid
