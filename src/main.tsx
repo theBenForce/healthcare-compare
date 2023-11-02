@@ -10,6 +10,7 @@ import './i18n.ts';
 import { ThemeProvider } from '@mui/material';
 import { WithCloudAuth } from './providers/cloudAuth.tsx';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { WithCloudSync } from './providers/cloudSync.tsx';
 
 
 const client_id = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -40,7 +41,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <ThemeProvider theme={theme}>
             <CssBaseline>
               <WithDB>
-                <App />
+                <WithCloudSync>
+                  <App />
+                </WithCloudSync>
               </WithDB>
             </CssBaseline>
           </ThemeProvider>

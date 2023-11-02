@@ -24,29 +24,12 @@ import { TableNames, useDB } from './providers/db';
 import { useAppContext } from './providers/state';
 import { SettingsPage } from './pages/settings';
 import { AccountMenu } from './components/AccountMenu';
+import { CloudSyncStatus } from './components/CloudSync';
 
 
 function App() {
   const [isDrawerOpen, setDrawerOpen] = React.useState(false);
   const { title } = useAppContext();
-  // const { db } = useDB();
-
-  // const downloadConfig = async () => {
-  //   const storeNames = db?.objectStoreNames ?? [];
-  //   const config = {} as Record<string, Array<unknown>>;
-
-  //   for (const storeName of storeNames) {
-  //     const data = await db?.getAll(storeName);
-  //     config[storeName] = data ?? [];
-  //   }
-
-  //   const configBlob = new Blob([JSON.stringify(config)], { type: 'application/json' });
-
-  //   const link = document.createElement('a');
-  //   link.href = URL.createObjectURL(configBlob);
-  //   link.download = 'healthcare-compare.json';
-  //   link.click();
-  // }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw' }}>
@@ -62,6 +45,7 @@ function App() {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'left' }}>{title}</Typography>
+            <CloudSyncStatus />
             <AccountMenu />
           </Toolbar>
         </AppBar>
