@@ -6,5 +6,7 @@ export const UserAvatar: React.FC = () => {
   const { profile } = useCloudAuth();
   if (!profile) return null;
 
-  return <Avatar alt={profile.name} src={profile.picture}>{profile.name.split(/\s+/).map(word => word[0].toUpperCase()).join('')}</Avatar>
+  const backupDisplay = profile.name.split(/\s+/).map(word => word[0].toUpperCase()).join('');
+
+  return <Avatar alt={profile.name} src={profile.picture}>{backupDisplay}</Avatar>
 }
