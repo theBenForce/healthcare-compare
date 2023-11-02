@@ -23,7 +23,7 @@ import { SummaryPage } from './pages/summary';
 import { TableNames, useDB } from './providers/db';
 import { useAppContext } from './providers/state';
 import { SettingsPage } from './pages/settings';
-import { UserAvatar } from './components/UserAvatar';
+import { AccountMenu } from './components/AccountMenu';
 
 
 function App() {
@@ -62,7 +62,7 @@ function App() {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'left' }}>{title}</Typography>
-            <UserAvatar />
+            <AccountMenu />
           </Toolbar>
         </AppBar>
 
