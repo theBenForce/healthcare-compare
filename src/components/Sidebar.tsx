@@ -23,6 +23,7 @@ interface RootMenuRecord {
   path: string;
   name: string;
   icon?: React.ReactNode;
+  disabled?: boolean;
 }
 
 const menuItems: Array<RootMenuRecord> = [
@@ -47,6 +48,7 @@ const menuItems: Array<RootMenuRecord> = [
     icon: <CategoryIcon />,
   },
   {
+    disabled: true,
     path: '/settings',
     name: 'Settings',
     icon: <SettingsIcon />
@@ -66,7 +68,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
   return <Drawer anchor="left" open={open} onClose={onClose} >
     <MenuList sx={{ width: drawerWidth }}>
-      {menuItems.map((item) => <MenuItem key={item.path} onClick={navigateTo(item.path)} selected={location.pathname === item.path} >
+      {menuItems.filter(item => !item.disabled).map((item) => <MenuItem key={item.path} onClick={navigateTo(item.path)} selected={location.pathname === item.path} >
         <ListItemIcon>
           {item.icon}
         </ListItemIcon>
