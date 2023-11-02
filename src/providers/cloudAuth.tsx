@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { TokenResponse, googleLogout, useGoogleLogin, useGoogleOneTapLogin } from '@react-oauth/google';
+import { CredentialResponse, TokenResponse, googleLogout, useGoogleLogin, useGoogleOneTapLogin } from '@react-oauth/google';
 import React, { PropsWithChildren } from 'react';
 import Axios from 'axios';
 
@@ -10,9 +10,12 @@ export interface UserProfile {
   picture: string;
 }
 
+type PersistedToken = TokenResponse & { expires_at: number };
+
 interface CloudAuthContextInterface {
-  authToken: string | null;
+  authToken: PersistedToken | null;
   profile: UserProfile | null;
+  drive: typeof gapi.client.drive | null;
   signOut: () => void;
   signIn: () => void;
 }
@@ -20,6 +23,7 @@ interface CloudAuthContextInterface {
 const cloudAuthContext = React.createContext<CloudAuthContextInterface>({
   authToken: null,
   profile: null,
+  drive: null,
   signOut: () => { },
   signIn: () => { },
 });
@@ -27,21 +31,23 @@ const cloudAuthContext = React.createContext<CloudAuthContextInterface>({
 export const useCloudAuth = () => React.useContext(cloudAuthContext);
 
 const SCOPE = [
-  'https://www.googleapis.com/auth/drive.appdata'
+  'https://www.googleapis.com/auth/drive.appdata',
+  'https://www.googleapis.com/auth/drive.appfolder'
 ];
 
 export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
-  const [authToken, setAuthToken] = React.useState<string | null>(null);
+  const [credential, setCredential] = React.useState<CredentialResponse | null>(null);
+  const [authToken, setAuthToken] = React.useState<PersistedToken | null>(null);
   const [profile, setProfile] = React.useState<UserProfile | null>(null);
   const [drive, setDrive] = React.useState<typeof gapi.client.drive | null>(null);
 
   React.useEffect(() => {
-    if (!authToken || profile) return;
+    if (!authToken?.access_token || profile) return;
 
     Axios
       .get(`https://www.googleapis.com/oauth2/v1/userinfo`, {
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${authToken.access_token}`,
           Accept: 'application/json'
         }
       })
@@ -56,38 +62,52 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
 
   const loginWithGoogle = useGoogleLogin({
     onSuccess: (response: Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>) => {
-      setAuthToken(response.access_token);
+      console.info(`Logged in with Google`);
+      const persistedToken = { ...response, expires_at: Date.now() + response.expires_in * 1000 };
+      setAuthToken(persistedToken);
 
-      localStorage.setItem('authToken', JSON.stringify(response));
+      localStorage.setItem('authToken', JSON.stringify(persistedToken));
     },
     scope: SCOPE.join(' '),
     prompt: 'none'
-  })
+  });
+
+  React.useEffect(() => {
+    if (!credential || !loginWithGoogle || !credential) return;
+    const expiresAt = authToken?.expires_at ?? 0;
+    if (expiresAt > Date.now()) return;
+
+    console.info(`Refreshing auth token...`);
+
+    loginWithGoogle({
+      prompt: 'none',
+      hint: credential.credential,
+    });
+  }, [authToken?.expires_at, credential, loginWithGoogle]);
+
+  React.useEffect(() => {
+    if (!credential?.credential || authToken) return;
+
+    loginWithGoogle({
+      hint: credential.credential,
+    })
+  }, [authToken, credential?.credential, loginWithGoogle]);
 
   useGoogleOneTapLogin({
     disabled: authToken !== null,
     onSuccess(response) {
-      loginWithGoogle({
-        hint: response.credential
-      })
+      if (response.credential) {
+        localStorage.setItem('googleCredential', JSON.stringify(response));
+      }
+
+      setCredential(response ?? null);
     }
   })
 
   React.useEffect(() => {
-    if (!drive || !authToken) return;
-
-    drive.files.list({
-      access_token: authToken,
-      spaces: 'appDataFolder',
-      fields: 'nextPageToken, files(id, name)',
-    }).then((res) => {
-      console.dir(res);
-    });
-  }, [authToken, drive]);
-
-  React.useEffect(() => {
     const auth = JSON.parse(localStorage.getItem('authToken') ?? 'null');
     const profile = JSON.parse(localStorage.getItem('profile') ?? 'null');
+    const googleCredential = JSON.parse(localStorage.getItem('googleCredential') ?? 'null');
     if (profile) {
       console.info(`Setting profile from local storage: ${profile.name}`);
       setProfile(profile);
@@ -95,8 +115,14 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
 
     if (auth?.access_token) {
       console.info(`Setting auth token from local storage`);
-      setAuthToken(auth.access_token);
+      setAuthToken(auth);
     }
+
+    if (googleCredential) {
+      console.info(`Setting credential from local storage`);
+      setCredential(googleCredential);
+    }
+
     // Initializes the client with the API key and the Translate API.
     // @ts-ignore
     gapi.client.init({
@@ -121,5 +147,5 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
     setAuthToken(null);
   };
 
-  return <cloudAuthContext.Provider value={{ authToken, signOut, signIn, profile }} children={children} />;
+  return <cloudAuthContext.Provider value={{ authToken, signOut, signIn, profile, drive }} children={children} />;
 }

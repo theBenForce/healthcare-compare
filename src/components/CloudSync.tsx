@@ -6,7 +6,9 @@ import { useCloudSync } from '../providers/cloudSync';
 import { CircularProgress } from '@mui/material';
 
 export const CloudSyncStatus: React.FC = () => {
-  const { sync, isSyncing } = useCloudSync();
+  const { sync, isSyncing, isSyncEnabled } = useCloudSync();
+
+  if (!isSyncEnabled) return null;
 
   return <IconButton onClick={sync} disabled={isSyncing} color='secondary'>
     {isSyncing ? <CircularProgress /> : <CloudIcon />}
