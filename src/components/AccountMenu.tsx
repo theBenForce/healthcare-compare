@@ -1,7 +1,13 @@
-import { Avatar, Divider, ListItemIcon, Menu, MenuItem, useTheme } from '@mui/material';
+import { Logout } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
+import Avatar from '@mui/material/Avatar';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+
+
 import React from 'react';
 import { useCloudAuth } from '../providers/cloudAuth';
-import { Logout } from '@mui/icons-material';
 
 export const AccountMenu: React.FC = () => {
   const { profile, signOut } = useCloudAuth();

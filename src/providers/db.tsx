@@ -22,8 +22,8 @@ interface DBContextInterface {
 
 export const DBContext = React.createContext<DBContextInterface>({
   db: null,
-  createBackup: async () => ({}),
-  mergeStates: async () => { },
+  createBackup: async () => ({} as DbBackup),
+  mergeStates: async () => ({} as DbBackup),
 });
 
 export const useDB = () => React.useContext(DBContext);
@@ -84,9 +84,10 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
     const existingData = await createBackup();
     const backup = merge(existingData, backupValues);
     const transaction = db?.transaction(Object.keys(backup), 'readwrite');
+    const storeNames = Object.values(TableNames);
 
     if (transaction) {
-      for (const storeName of Object.keys(backup)) {
+      for (const storeName of storeNames) {
         const store = transaction.objectStore(storeName);
         const data = backup[storeName] as Array<unknown>;
 

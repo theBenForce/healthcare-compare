@@ -26,7 +26,7 @@ import { SettingsPage } from './pages/settings';
 import { AccountMenu } from './components/AccountMenu';
 import { CloudSyncStatus } from './components/CloudSync';
 import { useFlag } from './providers/featureFlags';
-import { Stack } from '@mui/material';
+import Stack from '@mui/material/Stack';
 
 
 function App() {
