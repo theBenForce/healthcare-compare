@@ -45,13 +45,17 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
       let existingBackup = {} as DbBackup;
 
       if (existingFile?.id) {
-        const fileContent = await drive.files.get({
-          fileId: existingFile.id,
-          alt: 'media',
-          access_token: authToken.access_token,
+        const fileContent = await Axios.get<DbBackup>(`https://www.googleapis.com/drive/v3/files/${existingFile.id}`, {
+          headers: {
+            Authorization: `Bearer ${authToken.access_token}`,
+            Accept: 'application/json'
+          },
+          params: {
+            alt: 'media'
+          },
         });
 
-        existingBackup = JSON.parse(fileContent.body) as DbBackup;
+        existingBackup = fileContent.data;
 
         console.info(`Existing backup loaded`);
         console.dir(existingBackup);

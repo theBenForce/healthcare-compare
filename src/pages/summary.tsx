@@ -1,10 +1,12 @@
 import React from 'react';
 import { useAppContext } from '../providers/state';
-import { Stack, Typography, useTheme } from '@mui/material';
 import { useCostReport } from '../hooks/costReport';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { useTranslation } from 'react-i18next';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import useTheme from '@mui/material/styles/useTheme';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
 export const SummaryPage: React.FC = () => {
   const { setTitle } = useAppContext();
@@ -71,3 +73,5 @@ export const SummaryPage: React.FC = () => {
     <Typography variant="h6">{t('summary.disclaimer.content')}</Typography>
   </Stack>;
 };
+
+export default SummaryPage;

@@ -1,4 +1,3 @@
-import { Accordion, AccordionDetails, AccordionSummary, Fab, LinearProgress, Stack, TextField, Typography, useTheme } from '@mui/material';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppContext } from '../providers/state';
@@ -15,6 +14,15 @@ import { ExpenseSchema } from '../types/expense.dto';
 import { ExpenseList } from './personEdit/expenseList';
 
 import { useTranslation } from 'react-i18next';
+import useTheme from '@mui/material/styles/useTheme';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import LinearProgress from '@mui/material/LinearProgress';
+import TextField from '@mui/material/TextField';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Fab from '@mui/material/Fab';
 
 export const EditCategoryPage: React.FC = () => {
   const { get, save } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
@@ -91,3 +99,5 @@ export const EditCategoryPage: React.FC = () => {
     </Stack>
   </Stack>;
 }
+
+export default EditCategoryPage;

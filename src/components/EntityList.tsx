@@ -12,7 +12,7 @@ import { BaseSchema } from '../types/base.dto';
 import { EntityCard } from './EntityCard';
 
 interface EntityListParams {
-  table: TableNames;
+  table: `${TableNames}`;
   title: string;
 }
 
@@ -31,7 +31,7 @@ export const EntityList: React.FC<EntityListParams> = ({ table, title }) => {
     await save({
       id,
       name: `New ${table}`,
-      type: table,
+      type: table as TableNames,
     });
     navigate(`/${table}/${id}`);
   };
@@ -44,4 +44,6 @@ export const EntityList: React.FC<EntityListParams> = ({ table, title }) => {
       <AddIcon />
     </Fab>
   </Grid>;
-}
+};
+
+export default EntityList;

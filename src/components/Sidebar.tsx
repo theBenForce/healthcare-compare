@@ -4,7 +4,11 @@ import PlansIcon from '@mui/icons-material/MedicationRounded';
 import CategoryIcon from '@mui/icons-material/CategoryRounded';
 import SettingsIcon from '@mui/icons-material/SettingsRounded';
 
-import { Drawer, MenuList, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
+import Drawer from '@mui/material/Drawer';
+import MenuList from '@mui/material/MenuList';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import React from 'react';
 import {
   useNavigate,
@@ -77,3 +81,5 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
     </MenuList>
   </Drawer>;
 };
+
+export default Sidebar;

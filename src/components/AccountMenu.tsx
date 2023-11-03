@@ -51,3 +51,5 @@ export const AccountMenu: React.FC = () => {
     </Menu>
   </>;
 }
+
+export default AccountMenu;

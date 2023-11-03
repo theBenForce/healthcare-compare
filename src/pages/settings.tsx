@@ -20,3 +20,5 @@ export const SettingsPage: React.FC = () => {
     </ListItem>
   </List>
 }
+
+export default SettingsPage;

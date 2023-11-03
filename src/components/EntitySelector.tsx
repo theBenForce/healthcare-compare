@@ -4,7 +4,7 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useTable } from '../hooks/table';
 import { BaseSchema } from '../types/base.dto';
-import { SxProps } from '@mui/material';
+import type { SxProps } from '@mui/material';
 
 interface EntitySelectorParams {
   value: string;

@@ -4,12 +4,22 @@ import { PlanSchema } from "../../types/plan.dto";
 import { useAppContext } from "../../providers/state";
 import { useNavigate, useParams } from "react-router-dom";
 import SaveIcon from "@mui/icons-material/SaveRounded";
-import { Accordion, AccordionDetails, AccordionSummary, Fab, FormControlLabel, LinearProgress, Stack, Switch, TextField, Typography, useTheme } from "@mui/material";
 import { ExpandCircleDownRounded } from "@mui/icons-material";
 import { useTable } from "../../hooks/table";
 import { TableNames } from "../../providers/db";
 import { PlanLimitEditor } from "./limitEditor";
 import { CoverageList } from "../../components/CoverageList";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import LinearProgress from "@mui/material/LinearProgress";
+import TextField from "@mui/material/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import Fab from "@mui/material/Fab";
+import useTheme from "@mui/material/styles/useTheme";
 
 export const EditPlanPage: React.FC = () => {
   const { setTitle } = useAppContext();
@@ -80,3 +90,5 @@ export const EditPlanPage: React.FC = () => {
     </Fab>
   </Stack>
 };
+
+export default EditPlanPage;

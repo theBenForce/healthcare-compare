@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { Button, DialogActions, DialogContent, DialogTitle, LinearProgress, Stack, TextField } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import { useTable } from '../../hooks/table';
 import { TableNames } from '../../providers/db';
@@ -8,6 +7,13 @@ import { ExpenseSchema } from '../../types/expense.dto';
 import { DollarField } from '../DollarField';
 import { EntitySelector } from '../EntitySelector';
 import { MonthSelector } from '../MonthSelector';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import LinearProgress from '@mui/material/LinearProgress';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
 
 
 interface EditExpenseDialogProps {
