@@ -3,10 +3,12 @@ import { IDBPDatabase, openDB } from 'idb';
 
 interface DBContextInterface {
   db: IDBPDatabase | null;
+  createBackup: () => Promise<Record<string, unknown>>;
 }
 
 export const DBContext = React.createContext<DBContextInterface>({
-  db: null
+  db: null,
+  createBackup: async () => ({}),
 });
 
 export enum TableNames {
@@ -57,8 +59,20 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
     });
   }, []);
 
+  const createBackup = React.useCallback(async () => {
+    const storeNames = db?.objectStoreNames ?? [];
+    const config = {} as Record<string, Array<unknown>>;
+
+    for (const storeName of storeNames) {
+      const data = await db?.getAll(storeName);
+      config[storeName] = data ?? [];
+    }
+
+    return config;
+  }, [db]);
+
   return (
-    <DBContext.Provider value={{ db }}>
+    <DBContext.Provider value={{ db, createBackup }}>
       {children}
     </DBContext.Provider>
   );

@@ -10,7 +10,7 @@ export const CloudSyncStatus: React.FC = () => {
 
   if (!isSyncEnabled) return null;
 
-  return <IconButton onClick={sync} disabled={isSyncing} color='secondary'>
+  return <IconButton onClick={sync} disabled={isSyncing} color='info'>
     {isSyncing ? <CircularProgress /> : <CloudIcon />}
   </IconButton>
 }

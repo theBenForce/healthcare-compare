@@ -2,7 +2,6 @@ import React from 'react';
 import { useCloudAuth } from './cloudAuth';
 import { useDB } from './db';
 import Axios from 'axios';
-import { ResetTvOutlined } from '@mui/icons-material';
 
 interface CloudSyncContextInterface {
   resetSync: () => void;
@@ -24,7 +23,7 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
   const [isSyncing, setIsSyncing] = React.useState(false);
   const { authToken, drive } = useCloudAuth();
   const [syncInterval, setSyncInterval] = React.useState<NodeJS.Timeout | null>(null);
-  const { db } = useDB();
+  const { createBackup } = useDB();
 
   const isSyncEnabled = React.useMemo(() => {
     const result = Boolean(authToken?.access_token) && Boolean(drive);
@@ -34,29 +33,20 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
 
   const sync = React.useCallback(() => {
     console.info(`Syncing...`);
-    if (!db || !authToken || !drive) return;
+    if (!authToken || !drive) return;
     setIsSyncing(true);
 
     const handler = async () => {
       console.info(`Using token ${authToken}`);
-      const storeNames = db?.objectStoreNames ?? [];
-      const config = {} as Record<string, Array<unknown>>;
+      const backup = await createBackup();
 
-      for (const storeName of storeNames) {
-        const data = await db?.getAll(storeName);
-        config[storeName] = data ?? [];
-      }
-
-      const configBlob = new Blob([JSON.stringify(config)], { type: 'application/json' });
-
+      const configBlob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
 
       const existingFiles = await drive.files.list({
         access_token: authToken.access_token,
         spaces: 'appDataFolder',
         fields: 'nextPageToken, files(id, name)',
       });
-
-
 
       const metadata = {
         'name': 'backup.json', // Filename at Google Drive
@@ -105,7 +95,7 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
     }).finally(() => {
       setIsSyncing(false);
     });
-  }, [db, authToken, drive]);
+  }, [createBackup, authToken, drive]);
 
   const resetSync = React.useCallback(() => {
     if (isSyncing) return;

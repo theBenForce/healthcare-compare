@@ -11,6 +11,7 @@ import { ThemeProvider } from '@mui/material';
 import { WithCloudAuth } from './providers/cloudAuth.tsx';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { WithCloudSync } from './providers/cloudSync.tsx';
+import { WithFeatureFlags } from './providers/featureFlags.tsx';
 
 
 const client_id = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -34,21 +35,23 @@ Sentry.init({
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <GoogleOAuthProvider clientId={client_id}>
-    <React.StrictMode>
-      <WithCloudAuth>
-        <WithAppContext>
-          <ThemeProvider theme={theme}>
-            <CssBaseline>
-              <WithDB>
-                <WithCloudSync>
-                  <App />
-                </WithCloudSync>
-              </WithDB>
-            </CssBaseline>
-          </ThemeProvider>
-        </WithAppContext>
-      </WithCloudAuth>
-    </React.StrictMode>
-  </GoogleOAuthProvider>,
+  <WithFeatureFlags>
+    <GoogleOAuthProvider clientId={client_id}>
+      <React.StrictMode>
+        <WithCloudAuth>
+          <WithAppContext>
+            <ThemeProvider theme={theme}>
+              <CssBaseline>
+                <WithDB>
+                  <WithCloudSync>
+                    <App />
+                  </WithCloudSync>
+                </WithDB>
+              </CssBaseline>
+            </ThemeProvider>
+          </WithAppContext>
+        </WithCloudAuth>
+      </React.StrictMode>
+    </GoogleOAuthProvider>
+  </WithFeatureFlags>,
 )

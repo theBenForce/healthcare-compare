@@ -20,16 +20,19 @@ import { EditCategoryPage } from './pages/editCategory';
 import { EditPersonPage } from './pages/personEdit';
 import { EditPlanPage } from './pages/editPlan';
 import { SummaryPage } from './pages/summary';
-import { TableNames, useDB } from './providers/db';
+import { TableNames } from './providers/db';
 import { useAppContext } from './providers/state';
 import { SettingsPage } from './pages/settings';
 import { AccountMenu } from './components/AccountMenu';
 import { CloudSyncStatus } from './components/CloudSync';
+import { useFlag } from './providers/featureFlags';
+import { Stack } from '@mui/material';
 
 
 function App() {
   const [isDrawerOpen, setDrawerOpen] = React.useState(false);
   const { title } = useAppContext();
+  const syncEnabled = useFlag('CLOUD_SYNC');
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw' }}>
@@ -45,8 +48,9 @@ function App() {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'left' }}>{title}</Typography>
-            <CloudSyncStatus />
-            <AccountMenu />
+            {syncEnabled && <Stack direction='row' spacing={2}><CloudSyncStatus />
+              <AccountMenu />
+            </Stack>}
           </Toolbar>
         </AppBar>
 

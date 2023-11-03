@@ -2,6 +2,7 @@
 import { CredentialResponse, TokenResponse, googleLogout, useGoogleLogin, useGoogleOneTapLogin } from '@react-oauth/google';
 import React, { PropsWithChildren } from 'react';
 import Axios from 'axios';
+import { useFlag } from './featureFlags';
 
 
 export interface UserProfile {
@@ -40,6 +41,7 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
   const [authToken, setAuthToken] = React.useState<PersistedToken | null>(null);
   const [profile, setProfile] = React.useState<UserProfile | null>(null);
   const [drive, setDrive] = React.useState<typeof gapi.client.drive | null>(null);
+  const syncEnabled = useFlag('CLOUD_SYNC');
 
   React.useEffect(() => {
     if (!authToken?.access_token || profile) return;
@@ -94,7 +96,7 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
   }, [authToken, credential?.credential, loginWithGoogle]);
 
   useGoogleOneTapLogin({
-    disabled: authToken !== null,
+    disabled: authToken !== null || !syncEnabled,
     onSuccess(response) {
       if (response.credential) {
         localStorage.setItem('googleCredential', JSON.stringify(response));
@@ -105,6 +107,7 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
   })
 
   React.useEffect(() => {
+    if (!syncEnabled) return;
     const auth = JSON.parse(localStorage.getItem('authToken') ?? 'null');
     const profile = JSON.parse(localStorage.getItem('profile') ?? 'null');
     const googleCredential = JSON.parse(localStorage.getItem('googleCredential') ?? 'null');
@@ -132,7 +135,7 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
       console.info(`Drive API Loaded!`)
       setDrive(gapi.client.drive);
     });
-  }, []);
+  }, [syncEnabled]);
 
   const signIn = () => {
     loginWithGoogle();
