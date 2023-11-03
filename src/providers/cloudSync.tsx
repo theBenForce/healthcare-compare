@@ -54,6 +54,8 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
         }
       });
 
+      console.info(`Found ${existingFiles.data.files?.length} files`);
+
       const existingFile = existingFiles.data.files?.find((x: any) => x.name === BACKUP_FILENAME);
 
       let existingBackup = {} as DbBackup;
