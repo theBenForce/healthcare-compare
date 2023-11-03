@@ -66,7 +66,7 @@ const columnGroupingModel: GridColumnGroupingModel = [
 
 export const CoverageList: React.FC<CoverageListParams> = ({ planId, categoryId }) => {
   const { remove, save } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES });
-  const { coverages, refresh } = useCoverages({ planId, categoryId });
+  const { coverages } = useCoverages({ planId, categoryId });
   const [editingCoverageId, setEditingCoverageId] = React.useState<string | null>(null);
 
   const { values: plans } = useTable<PlanSchema>({ tableName: TableNames.PLANS });
@@ -76,8 +76,7 @@ export const CoverageList: React.FC<CoverageListParams> = ({ planId, categoryId 
     setEditingCoverageId(null);
     if (!value) return;
     await save(value);
-    refresh();
-  }, [save, refresh]);
+  }, [save]);
 
   const columnDefs = React.useMemo(() => {
     let result = [...columns];

@@ -2,16 +2,15 @@ import React from 'react';
 import { useCloudAuth } from './cloudAuth';
 import { useDB } from './db';
 import Axios from 'axios';
+import { useAppContext } from './state';
 
 interface CloudSyncContextInterface {
-  resetSync: () => void;
   sync: () => void;
   isSyncing: boolean;
   isSyncEnabled: boolean;
 }
 
 const cloudSyncContext = React.createContext<CloudSyncContextInterface>({
-  resetSync: () => { },
   sync: () => { },
   isSyncing: false,
   isSyncEnabled: false,
@@ -24,12 +23,9 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
   const { authToken, drive } = useCloudAuth();
   const [syncInterval, setSyncInterval] = React.useState<NodeJS.Timeout | null>(null);
   const { createBackup } = useDB();
+  const { isModified } = useAppContext();
 
-  const isSyncEnabled = React.useMemo(() => {
-    const result = Boolean(authToken?.access_token) && Boolean(drive);
-    console.info(`Calculating sync enabled: ${result}`);
-    return result;
-  }, [authToken?.access_token, drive]);
+  const isSyncEnabled = React.useMemo(() => Boolean(authToken?.access_token) && Boolean(drive), [authToken?.access_token, drive]);
 
   const sync = React.useCallback(() => {
     console.info(`Syncing...`);
@@ -97,14 +93,25 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
     });
   }, [createBackup, authToken, drive]);
 
-  const resetSync = React.useCallback(() => {
-    if (isSyncing) return;
-    if (syncInterval) clearInterval(syncInterval);
-    setSyncInterval(setTimeout(sync, 1000 * 10));
-  }, [isSyncing, sync, syncInterval]);
+  React.useEffect(() => {
+    if (!isSyncEnabled) return;
+
+    if (syncInterval) {
+      clearTimeout(syncInterval);
+    }
+
+    if (!isModified) return;
+
+    const timeout = setTimeout(() => {
+      sync();
+    }, 10_000);
+
+    setSyncInterval(timeout);
+
+  }, [isModified, isSyncEnabled, sync, syncInterval]);
 
   return (
-    <cloudSyncContext.Provider value={{ sync, resetSync, isSyncing, isSyncEnabled }}>
+    <cloudSyncContext.Provider value={{ sync, isSyncing, isSyncEnabled }}>
       {children}
     </cloudSyncContext.Provider>
   );

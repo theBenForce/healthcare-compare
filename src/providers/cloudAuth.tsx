@@ -63,15 +63,25 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
   }, [authToken, profile]);
 
   const loginWithGoogle = useGoogleLogin({
+    flow: 'implicit',
     onSuccess: (response: Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>) => {
-      console.info(`Logged in with Google`);
+      console.info(`Logged in with Google: ${JSON.stringify(response, null, 2)}`);
       const persistedToken = { ...response, expires_at: Date.now() + response.expires_in * 1000 };
       setAuthToken(persistedToken);
 
       localStorage.setItem('authToken', JSON.stringify(persistedToken));
     },
+    onError(errorResponse) {
+      console.error(`Error logging in with Google: ${JSON.stringify(errorResponse, null, 2)}`);
+    },
+    onNonOAuthError(nonOAuthError) {
+      console.error(`Non OAuth Error logging in with Google: ${JSON.stringify(nonOAuthError, null, 2)}`);
+    },
     scope: SCOPE.join(' '),
-    prompt: 'none'
+    prompt: 'none',
+    error_callback(nonOAuthError) {
+      console.error(`Non OAuth Error logging in with Google: ${JSON.stringify(nonOAuthError, null, 2)}`);
+    },
   });
 
   React.useEffect(() => {
@@ -82,7 +92,6 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
     console.info(`Refreshing auth token...`);
 
     loginWithGoogle({
-      prompt: 'none',
       hint: credential.credential,
     });
   }, [authToken?.expires_at, credential, loginWithGoogle]);
@@ -98,12 +107,16 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
   useGoogleOneTapLogin({
     disabled: authToken !== null || !syncEnabled,
     onSuccess(response) {
+      console.info(`Logged in with Google One Tap`)
       if (response.credential) {
         localStorage.setItem('googleCredential', JSON.stringify(response));
       }
 
       setCredential(response ?? null);
-    }
+    },
+    onError() {
+      console.error(`Error logging in with Google One Tap`);
+    },
   })
 
   React.useEffect(() => {
@@ -135,19 +148,20 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
       console.info(`Drive API Loaded!`)
       setDrive(gapi.client.drive);
     });
-  }, [syncEnabled]);
+  }, [loginWithGoogle, syncEnabled]);
 
   const signIn = () => {
     loginWithGoogle();
   };
 
   const signOut = () => {
+    setCredential(null);
+    setAuthToken(null);
     localStorage.removeItem('authToken');
     localStorage.removeItem('profile');
     googleLogout();
 
     setProfile(null);
-    setAuthToken(null);
   };
 
   return <cloudAuthContext.Provider value={{ authToken, signOut, signIn, profile, drive }} children={children} />;
