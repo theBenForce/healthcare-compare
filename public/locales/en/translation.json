@@ -4,6 +4,10 @@
     "about": {
       "title": "About",
       "content": "Welcome to Healthcare Compared. This site was built to provide a simple way to compare insurance plans each year."
+    },
+    "disclaimer": {
+      "title": "Disclaimer",
+      "content": "\"Healthcare Compared\" is a tool created to facilitate healthcare plan comparisons and provide estimates based on the data you input. The information presented on this web application is for informational and educational purposes only and should not be considered as professional financial or healthcare advice."
     }
   },
   "editCategory": {

@@ -67,5 +67,7 @@ export const SummaryPage: React.FC = () => {
     </>}
     <Typography variant="h6">{t('summary.about.title')}</Typography>
     <Typography variant="body1">{t('summary.about.content')}</Typography>
+    <Typography variant="h6">{t('summary.disclaimer.title')}</Typography>
+    <Typography variant="h6">{t('summary.disclaimer.content')}</Typography>
   </Stack>;
 };
