@@ -80,9 +80,9 @@ export const useCostReport = (): CostReport => {
           }
         });
 
-        const expenses = Math.min(inNetworkCharges, plan.inNetworkLimt.outOfPocketMax) + Math.min(outOfNetworkCharges, plan.outOfNetworkLimit.outOfPocketMax);
+        const expenses = Math.min(inNetworkCharges, plan.inNetworkLimt?.outOfPocketMax ?? 0) + Math.min(outOfNetworkCharges, plan.outOfNetworkLimit?.outOfPocketMax ?? 0);
         const discount = plan.discount ?? 0;
-        const premiums = plan.monthlyPremium * 12;
+        const premiums = (plan.monthlyPremium ?? 0) * 12;
         const total = premiums + expenses - discount;
         
         result.push({
