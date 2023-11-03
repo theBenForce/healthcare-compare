@@ -19,7 +19,7 @@ import { ExpenseSchema } from '../types/expense.dto';
 import { PersonSchema, isPersonSchema } from '../types/person.dto';
 
 interface EntityCardParams {
-  table: TableNames;
+  table: `${TableNames}`;
   entityId: string;
 }
 
@@ -60,7 +60,7 @@ const PersonOverview: React.FC<{ person: PersonSchema }> = ({ person }) => {
   </Paper>;
 };
 
-const useEntity = (table: TableNames, entityId: string) => {
+const useEntity = (table: `${TableNames}`, entityId: string) => {
   const { get } = useTable<BaseSchema>({ tableName: table });
   const [value, setValue] = React.useState<BaseSchema | null>(null);
 

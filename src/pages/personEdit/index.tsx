@@ -1,4 +1,3 @@
-import { Accordion, AccordionDetails, AccordionSummary, Fab, LinearProgress, Stack, TextField, Typography, useTheme } from '@mui/material';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppContext } from '../../providers/state';
@@ -12,6 +11,15 @@ import { TableNames } from '../../providers/db';
 import { ExpenseSchema } from '../../types/expense.dto';
 import { ExpenseList } from './expenseList';
 import { ExpandCircleDownRounded } from '@mui/icons-material';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import LinearProgress from '@mui/material/LinearProgress';
+import useTheme from '@mui/material/styles/useTheme';
+import TextField from '@mui/material/TextField';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Fab from '@mui/material/Fab';
 
 
 
@@ -81,3 +89,5 @@ export const EditPersonPage: React.FC = () => {
     </Stack>
   </Stack>;
 }
+
+export default EditPersonPage;

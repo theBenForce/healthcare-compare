@@ -15,7 +15,7 @@ export interface TableContextInterface<SchemaType extends BaseSchema | CoverageS
 }
 
 interface UseTableParams {
-  tableName: TableNames;
+  tableName: `${TableNames}`;
   filter?: RecordFilter;
 }
 

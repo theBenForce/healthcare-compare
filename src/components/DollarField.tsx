@@ -1,4 +1,4 @@
-import { SxProps } from '@mui/material';
+import type { SxProps } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import React from 'react';
