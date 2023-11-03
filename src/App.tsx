@@ -18,12 +18,12 @@ import { useAppContext } from './providers/state';
 import { useFlag } from './providers/featureFlags';
 import Stack from '@mui/material/Stack';
 
-const EntityList = React.lazy(() => import('./components/EntityList'));
-const EditCategoryPage = React.lazy(() => import('./pages/editCategory'));
-const EditPlanPage = React.lazy(() => import('./pages/editPlan'));
-const EditPersonPage = React.lazy(() => import('./pages/personEdit'));
-const SettingsPage = React.lazy(() => import('./pages/settings'));
-const SummaryPage = React.lazy(() => import('./pages/summary'));
+import EntityList from './components/EntityList';
+import EditCategoryPage from './pages/editCategory';
+import EditPlanPage from './pages/editPlan';
+import EditPersonPage from './pages/personEdit';
+import SettingsPage from './pages/settings';
+import SummaryPage from './pages/summary';
 
 const CloudSyncStatus = React.lazy(() => import('./components/CloudSync'));
 const AccountMenu = React.lazy(() => import('./components/AccountMenu'));
