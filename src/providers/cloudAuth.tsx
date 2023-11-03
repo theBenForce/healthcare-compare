@@ -16,7 +16,6 @@ type PersistedToken = TokenResponse & { expires_at: number };
 interface CloudAuthContextInterface {
   authToken: PersistedToken | null;
   profile: UserProfile | null;
-  drive: typeof gapi.client.drive | null;
   signOut: () => void;
   signIn: () => void;
 }
@@ -24,7 +23,6 @@ interface CloudAuthContextInterface {
 const cloudAuthContext = React.createContext<CloudAuthContextInterface>({
   authToken: null,
   profile: null,
-  drive: null,
   signOut: () => { },
   signIn: () => { },
 });
@@ -40,7 +38,6 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
   const [credential, setCredential] = React.useState<CredentialResponse | null>(null);
   const [authToken, setAuthToken] = React.useState<PersistedToken | null>(null);
   const [profile, setProfile] = React.useState<UserProfile | null>(null);
-  const [drive, setDrive] = React.useState<typeof gapi.client.drive | null>(null);
   const syncEnabled = useFlag('CLOUD_SYNC');
 
   React.useEffect(() => {
@@ -138,16 +135,6 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
       console.info(`Setting credential from local storage`);
       setCredential(googleCredential);
     }
-
-    // Initializes the client with the API key and the Translate API.
-    // @ts-ignore
-    gapi.client.init({
-      'apiKey': import.meta.env.VITE_GOOGLE_API_KEY,
-      'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-    }).then(function () {
-      console.info(`Drive API Loaded!`)
-      setDrive(gapi.client.drive);
-    });
   }, [loginWithGoogle, syncEnabled]);
 
   const signIn = () => {
@@ -164,5 +151,5 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
     setProfile(null);
   };
 
-  return <cloudAuthContext.Provider value={{ authToken, signOut, signIn, profile, drive }} children={children} />;
+  return <cloudAuthContext.Provider value={{ authToken, signOut, signIn, profile }} children={children} />;
 }
