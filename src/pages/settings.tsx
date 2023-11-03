@@ -2,7 +2,7 @@ import ListItemText from '@mui/material/ListItemText';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import React from 'react';
-import { Switch } from '@mui/material';
+import Switch from '@mui/material/Switch';
 import { FeatureFlags, useFeatureFlags, useFlag } from '../providers/featureFlags';
 
 export const SettingsPage: React.FC = () => {

@@ -7,7 +7,7 @@ import { WithAppContext } from './providers/state.tsx';
 import * as Sentry from "@sentry/react";
 import theme from './theme';
 import './i18n.ts';
-import { ThemeProvider } from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
 import { WithCloudAuth } from './providers/cloudAuth.tsx';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { WithCloudSync } from './providers/cloudSync.tsx';

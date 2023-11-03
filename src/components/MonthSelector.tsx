@@ -1,4 +1,5 @@
-import { Checkbox, FormControlLabel } from '@mui/material';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Unstable_Grid2';
 import React from 'react';
 import { MonthValueSchema } from '../types/expense.dto';
