@@ -99,7 +99,7 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
       form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
       form.append('file', backupBlob);
 
-      result = await drive.post('/files', form, {
+      result = await drive.post('https://www.googleapis.com/upload/drive/v3/files', form, {
         params: {
           uploadType: 'multipart',
           fields: 'id'
