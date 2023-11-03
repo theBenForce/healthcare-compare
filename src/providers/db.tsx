@@ -1,15 +1,8 @@
 import React from 'react';
 import { IDBPDatabase, openDB } from 'idb';
+import merge from 'lodash.merge';
 
-interface DBContextInterface {
-  db: IDBPDatabase | null;
-  createBackup: () => Promise<Record<string, unknown>>;
-}
 
-export const DBContext = React.createContext<DBContextInterface>({
-  db: null,
-  createBackup: async () => ({}),
-});
 
 export enum TableNames {
   PLANS = 'plan',
@@ -18,6 +11,20 @@ export enum TableNames {
   EXPENSES = 'expense',
   COVERAGES = 'coverage',
 }
+
+export type DbBackup = Record<`${TableNames}`, Array<unknown>>;
+
+interface DBContextInterface {
+  db: IDBPDatabase | null;
+  createBackup: () => Promise<DbBackup>;
+  mergeStates: (backup: DbBackup) => Promise<DbBackup>;
+}
+
+export const DBContext = React.createContext<DBContextInterface>({
+  db: null,
+  createBackup: async () => ({}),
+  mergeStates: async () => { },
+});
 
 export const useDB = () => React.useContext(DBContext);
 
@@ -60,19 +67,42 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const createBackup = React.useCallback(async () => {
-    const storeNames = db?.objectStoreNames ?? [];
-    const config = {} as Record<string, Array<unknown>>;
+    const storeNames = Object.values(TableNames);
+    const backup = {} as DbBackup;
 
     for (const storeName of storeNames) {
+      if (!db?.objectStoreNames.contains(storeName)) continue;
+
       const data = await db?.getAll(storeName);
-      config[storeName] = data ?? [];
+      backup[storeName] = data ?? [];
     }
 
-    return config;
+    return backup;
   }, [db]);
 
+  const mergeStates = React.useCallback(async (backupValues: DbBackup): Promise<DbBackup> => {
+    const existingData = await createBackup();
+    const backup = merge(existingData, backupValues);
+    const transaction = db?.transaction(Object.keys(backup), 'readwrite');
+
+    if (transaction) {
+      for (const storeName of Object.keys(backup)) {
+        const store = transaction.objectStore(storeName);
+        const data = backup[storeName] as Array<unknown>;
+
+        for (const item of data) {
+          await store.put(item);
+        }
+      }
+
+      await transaction.done;
+    }
+
+    return backup;
+  }, [db, createBackup]);
+
   return (
-    <DBContext.Provider value={{ db, createBackup }}>
+    <DBContext.Provider value={{ db, createBackup, mergeStates }}>
       {children}
     </DBContext.Provider>
   );

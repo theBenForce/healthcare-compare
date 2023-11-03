@@ -47,6 +47,9 @@ dependencies:
   idb:
     specifier: ^7.1.1
     version: 7.1.1
+  lodash.merge:
+    specifier: ^4.6.2
+    version: 4.6.2
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -772,8 +775,8 @@ packages:
       '@types/gapi.client.discovery-v1': 0.0.3
     dev: true
 
-  /@maxim_mazurok/gapi.client.drive-v3@0.0.20231024:
-    resolution: {integrity: sha512-gxncaEheiVL55ygKQwnZuuCAjFLPTipHcPbgqrXRcIZLg02iJQbuTx/PAvcWu8YcWBg86K1c7bDwdHT2eqWUZg==}
+  /@maxim_mazurok/gapi.client.drive-v3@0.0.20231029:
+    resolution: {integrity: sha512-aMyRTVaL3BpSHwc0uXCRztt/DtqjQynOBgYyWtSE4uW7gw9xlFFwk4VaPP/u7qJTpaHxdmPYx+pT9ki5z5iHTg==}
     dependencies:
       '@types/gapi.client': 1.0.7
       '@types/gapi.client.discovery-v1': 0.0.3
@@ -1208,7 +1211,7 @@ packages:
     resolution: {integrity: sha512-qEfI0LxUBadOLmym4FkaNGpI4ibBCBPJHiUFWKIv0GIp7yKT2d+wztJYKr9giIRecErUCF+jGSDw1fzTZ6hPVQ==}
     deprecated: use @types/gapi.client.drive-v3 instead; see https://github.com/Maxim-Mazurok/google-api-typings-generator/issues/652 for details
     dependencies:
-      '@maxim_mazurok/gapi.client.drive-v3': 0.0.20231024
+      '@maxim_mazurok/gapi.client.drive-v3': 0.0.20231029
     dev: true
 
   /@types/gapi.client@1.0.7:
@@ -2240,7 +2243,6 @@ packages:
 
   /lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
-    dev: true
 
   /loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}

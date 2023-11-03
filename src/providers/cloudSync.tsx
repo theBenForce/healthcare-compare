@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCloudAuth } from './cloudAuth';
-import { useDB } from './db';
+import { DbBackup, useDB } from './db';
 import Axios from 'axios';
 import { useAppContext } from './state';
 
@@ -22,7 +22,7 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
   const [isSyncing, setIsSyncing] = React.useState(false);
   const { authToken, drive } = useCloudAuth();
   const [syncInterval, setSyncInterval] = React.useState<NodeJS.Timeout | null>(null);
-  const { createBackup } = useDB();
+  const { mergeStates } = useDB();
   const { isModified } = useAppContext();
 
   const isSyncEnabled = React.useMemo(() => Boolean(authToken?.access_token) && Boolean(drive), [authToken?.access_token, drive]);
@@ -34,15 +34,32 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
 
     const handler = async () => {
       console.info(`Using token ${authToken}`);
-      const backup = await createBackup();
-
-      const configBlob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
 
       const existingFiles = await drive.files.list({
         access_token: authToken.access_token,
         spaces: 'appDataFolder',
         fields: 'nextPageToken, files(id, name)',
       });
+      const existingFile = existingFiles.result.files?.find(x => x.name === 'backup.json');
+
+      let existingBackup = {} as DbBackup;
+
+      if (existingFile?.id) {
+        const fileContent = await drive.files.get({
+          fileId: existingFile.id,
+          alt: 'media',
+          access_token: authToken.access_token,
+        });
+
+        existingBackup = JSON.parse(fileContent.body) as DbBackup;
+
+        console.info(`Existing backup loaded`);
+        console.dir(existingBackup);
+      }
+
+
+      const backup = await mergeStates(existingBackup);
+      const backupBlob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
 
       const metadata = {
         'name': 'backup.json', // Filename at Google Drive
@@ -52,14 +69,13 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
 
       const form = new FormData();
       form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-      form.append('file', configBlob);
+      form.append('file', backupBlob);
 
-      const existingFile = existingFiles.result.files?.find(x => x.name === 'backup.json');
 
       if (existingFile) {
         console.info(`Updating existing file ${existingFile.id}`);
 
-        const result = await Axios.patch(`https://www.googleapis.com/upload/drive/v3/files/${existingFile.id}`, configBlob, {
+        const result = await Axios.patch(`https://www.googleapis.com/upload/drive/v3/files/${existingFile.id}`, backupBlob, {
           headers: {
             Authorization: `Bearer ${authToken.access_token}`,
             Accept: 'application/json'
@@ -91,7 +107,7 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
     }).finally(() => {
       setIsSyncing(false);
     });
-  }, [createBackup, authToken, drive]);
+  }, [mergeStates, authToken, drive]);
 
   React.useEffect(() => {
     if (!isSyncEnabled) return;
