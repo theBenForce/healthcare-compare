@@ -17,6 +17,8 @@ const cloudSyncContext = React.createContext<CloudSyncContextInterface>({
   isSyncEnabled: false,
 });
 
+const BACKUP_FILENAME = 'backup.json';
+
 export const useCloudSync = () => React.useContext(cloudSyncContext);
 
 export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) => {
@@ -52,7 +54,7 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
         }
       });
 
-      const existingFile = existingFiles.data.files?.find((x: any) => x.name === 'backup.json');
+      const existingFile = existingFiles.data.files?.find((x: any) => x.name === BACKUP_FILENAME);
 
       let existingBackup = {} as DbBackup;
 
@@ -79,33 +81,28 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
       let result = null;
 
       if (existingFile) {
-        console.info(`Updating existing file ${existingFile.id}`);
+        console.info(`Deleting existing file ${existingFile.id}`);
 
-        result = await drive.patch(`/files/${existingFile.id}`, backupBlob, {
-          params: {
-            uploadType: 'media',
-            fields: 'id'
-          }
-        });
-      } else {
-        console.info(`Creating new file`);
-        const metadata = {
-          'name': 'backup.json', // Filename at Google Drive
-          'mimeType': 'application/json', // mimeType at Google Drive
-          'parents': ['appDataFolder'], // Folder ID at Google Drive
-        };
-
-        const form = new FormData();
-        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-        form.append('file', backupBlob);
-
-        result = await drive.post('/files', form, {
-          params: {
-            uploadType: 'multipart',
-            fields: 'id'
-          }
-        });
+        await drive.delete(`/files/${existingFile.id}`);
       }
+
+      console.info(`Creating new file`);
+      const metadata = {
+        'name': BACKUP_FILENAME, // Filename at Google Drive
+        'mimeType': 'application/json', // mimeType at Google Drive
+        'parents': ['appDataFolder'], // Folder ID at Google Drive
+      };
+
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+      form.append('file', backupBlob);
+
+      result = await drive.post('/files', form, {
+        params: {
+          uploadType: 'multipart',
+          fields: 'id'
+        }
+      });
 
       return result;
     };
