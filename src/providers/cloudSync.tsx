@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { useCloudAuth } from './cloudAuth';
 import { DbBackup, useDB } from './db';
@@ -20,36 +21,43 @@ export const useCloudSync = () => React.useContext(cloudSyncContext);
 
 export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [isSyncing, setIsSyncing] = React.useState(false);
-  const { authToken, drive } = useCloudAuth();
+  const { authToken } = useCloudAuth();
   const [syncInterval, setSyncInterval] = React.useState<NodeJS.Timeout | null>(null);
   const { mergeStates } = useDB();
   const { isModified } = useAppContext();
 
-  const isSyncEnabled = React.useMemo(() => Boolean(authToken?.access_token) && Boolean(drive), [authToken?.access_token, drive]);
+  const isSyncEnabled = React.useMemo(() => Boolean(authToken?.access_token), [authToken?.access_token]);
+
+  const drive = React.useMemo(() => {
+    return Axios.create({
+      baseURL: 'https://www.googleapis.com/drive/v3',
+      headers: {
+        Authorization: `Bearer ${authToken?.access_token}`,
+        Accept: 'application/json'
+      }
+    });
+  }, [authToken?.access_token]);
 
   const sync = React.useCallback(() => {
     console.info(`Syncing...`);
-    if (!authToken || !drive) return;
+    if (!authToken) return;
     setIsSyncing(true);
 
     const handler = async () => {
       console.info(`Using token ${authToken}`);
 
-      const existingFiles = await drive.files.list({
-        access_token: authToken.access_token,
-        spaces: 'appDataFolder',
-        fields: 'nextPageToken, files(id, name)',
+      const existingFiles = await drive.get('/files', {
+        params: {
+          spaces: 'appDataFolder',
+        }
       });
-      const existingFile = existingFiles.result.files?.find(x => x.name === 'backup.json');
+
+      const existingFile = existingFiles.data.files?.find((x: any) => x.name === 'backup.json');
 
       let existingBackup = {} as DbBackup;
 
       if (existingFile?.id) {
-        const fileContent = await Axios.get<DbBackup>(`https://www.googleapis.com/drive/v3/files/${existingFile.id}`, {
-          headers: {
-            Authorization: `Bearer ${authToken.access_token}`,
-            Accept: 'application/json'
-          },
+        const fileContent = await drive.get<DbBackup>(`/files/${existingFile.id}`, {
           params: {
             alt: 'media'
           },
@@ -79,11 +87,7 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
       if (existingFile) {
         console.info(`Updating existing file ${existingFile.id}`);
 
-        const result = await Axios.patch(`https://www.googleapis.com/upload/drive/v3/files/${existingFile.id}`, backupBlob, {
-          headers: {
-            Authorization: `Bearer ${authToken.access_token}`,
-            Accept: 'application/json'
-          },
+        const result = await drive.patch(`/files/${existingFile.id}`, backupBlob, {
           params: {
             uploadType: 'media',
             fields: 'id'
@@ -94,10 +98,10 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
       }
 
 
-      const result = await Axios.post('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', form, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          Accept: 'application/json'
+      const result = await drive.post('/files', form, {
+        params: {
+          uploadType: 'multipart',
+          fields: 'id'
         }
       });
 
