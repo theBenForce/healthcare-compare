@@ -14,39 +14,36 @@ interface UseCoveragesParams {
 
 export const useCoverages = ({planId, categoryId}: UseCoveragesParams) => {
   const [coverages, setCoverages] = React.useState<Array<CoverageSchema>>([]);
-  const { list: listCoverages } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES, filter: { planId, categoryId } });
-  const { list: listPlans } = useTable<PlanSchema>({ tableName: TableNames.PLANS });
-  const { list: listCategories } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
+  const { values: savedCoverages } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES, filter: { planId, categoryId } });
+  const { values: plans } = useTable<PlanSchema>({ tableName: TableNames.PLANS });
+  const { values: categories } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
   
-  const refresh = React.useCallback(async () => {
-    console.info(`Refreshing coverages for planId: ${planId} and categoryId: ${categoryId}`);
+  React.useEffect(() => {
+    const handler = async () => {
+      console.info(`Refreshing coverages for planId: ${planId} and categoryId: ${categoryId}`);
 
-    const result = await listCoverages();
-    if (planId) {
-      const categories = await listCategories();
-      const missingCategories = categories.filter(c => !result.find(r => r.categoryId === c.id)).map(c => CoverageSchema.parse({
+      const result = [...savedCoverages];
+      if (planId) {
+        const missingCategories = categories.filter(c => !result.find(r => r.categoryId === c.id)).map(c => CoverageSchema.parse({
           id: ulid(),
           planId,
           categoryId: c.id,
-      }));
-      result.push(...missingCategories);
-    } else if (categoryId) {
-      const plans = await listPlans();
-      const missingPlans = plans.filter(p => !result.find(r => r.planId === p.id)).map(p => CoverageSchema.parse({
+        }));
+        result.push(...missingCategories);
+      } else if (categoryId) {
+        const missingPlans = plans.filter(p => !result.find(r => r.planId === p.id)).map(p => CoverageSchema.parse({
           id: ulid(),
           planId: p.id,
           categoryId,
-      }));
-      result.push(...missingPlans);
-    }
+        }));
+        result.push(...missingPlans);
+      }
     
-    setCoverages(result);
-  }, [planId, categoryId, listCoverages, listCategories, listPlans]);
+      setCoverages(result);
+    };
+
+    handler();
+  }, [planId, categoryId, savedCoverages, categories, plans]);
   
-  React.useEffect(() => {
-    if (coverages.length) return;
-    refresh();
-  }, [planId, categoryId, coverages, refresh]);
-  
-  return {coverages, refresh};
+  return {coverages};
 }

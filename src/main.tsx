@@ -8,9 +8,17 @@ import * as Sentry from "@sentry/react";
 import theme from './theme';
 import './i18n.ts';
 import { ThemeProvider } from '@mui/material';
+import { WithCloudAuth } from './providers/cloudAuth.tsx';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { WithCloudSync } from './providers/cloudSync.tsx';
+import { WithFeatureFlags } from './providers/featureFlags.tsx';
+
+
+const client_id = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const sentry_dsn = import.meta.env.VITE_SENTRY_DSN;
 
 Sentry.init({
-  dsn: "https://070b10feac720ac4e210b8beb5b88fc0@o467164.ingest.sentry.io/4506141410000896",
+  dsn: sentry_dsn,
   integrations: [
     new Sentry.BrowserTracing({
       // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
@@ -27,15 +35,23 @@ Sentry.init({
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <WithAppContext>
-      <ThemeProvider theme={theme}>
-        <CssBaseline>
-          <WithDB>
-            <App />
-          </WithDB>
-        </CssBaseline>
-      </ThemeProvider>
-    </WithAppContext>
-  </React.StrictMode>,
+  <WithFeatureFlags>
+    <GoogleOAuthProvider clientId={client_id}>
+      <React.StrictMode>
+        <WithCloudAuth>
+          <WithAppContext>
+            <ThemeProvider theme={theme}>
+              <CssBaseline>
+                <WithDB>
+                  <WithCloudSync>
+                    <App />
+                  </WithCloudSync>
+                </WithDB>
+              </CssBaseline>
+            </ThemeProvider>
+          </WithAppContext>
+        </WithCloudAuth>
+      </React.StrictMode>
+    </GoogleOAuthProvider>
+  </WithFeatureFlags>,
 )

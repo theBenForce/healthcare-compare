@@ -44,39 +44,40 @@ const CategoryOverview: React.FC<{ category: CategorySchema }> = ({ category }) 
   </Paper>;
 };
 
-const PersonOverview: React.FC<{ person: PersonSchema }> = ({ person }) => {
-  const { values: expenses } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES, filter: { personId: person.id } });
+const usePersonExpenses = (personId: string) => {
+  const { values: expenses } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES, filter: { personId } });
 
-  const total = expenses.reduce((acc, expense) => acc + expense.amount, 0);
+  const total = React.useMemo(() => expenses.reduce((acc, expense) => acc + expense.amount, 0), [expenses]);
+
+  return { total, expenses };
+}
+
+const PersonOverview: React.FC<{ person: PersonSchema }> = ({ person }) => {
+  const { total } = usePersonExpenses(person.id);
 
   return <Paper elevation={0} sx={{ flexWrap: 'wrap' }}>
     <Chip label={`Expenses: ${total.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`} />
   </Paper>;
 };
 
-export const EntityCard: React.FC<EntityCardParams> = ({ table, entityId }) => {
-  const { get, remove } = useTable<BaseSchema>({ tableName: table });
+const useEntity = (table: TableNames, entityId: string) => {
+  const { get } = useTable<BaseSchema>({ tableName: table });
   const [value, setValue] = React.useState<BaseSchema | null>(null);
-  const navigate = useNavigate();
 
   React.useEffect(() => {
     if (!entityId) return;
 
+
     get(entityId).then(setValue);
   }, [get, entityId]);
 
-  const overview = React.useMemo(() => {
-    if (isPlanSchema(value)) {
-      return <PlanOverview plan={value} />;
-    } else if (isCategorySchema(value)) {
-      return <CategoryOverview category={value} />;
-    } else if (isPersonSchema(value)) {
-      return <PersonOverview person={value} />;
-    }
+  return { value };
+};
 
-    return null;
-  }, [value]);
-
+export const EntityCard: React.FC<EntityCardParams> = ({ table, entityId }) => {
+  const { remove } = useTable<BaseSchema>({ tableName: table });
+  const navigate = useNavigate();
+  const { value } = useEntity(table, entityId);
 
   const onDelete = (id: string) => {
     remove(id);
@@ -86,9 +87,11 @@ export const EntityCard: React.FC<EntityCardParams> = ({ table, entityId }) => {
     <CardHeader
       title={value?.name ?? 'Loading...'}
       subheader={value?.description} />
-    {overview && <CardContent>
-      {overview}
-    </CardContent>}
+    <CardContent>
+      {isPlanSchema(value) && <PlanOverview plan={value} />}
+      {isCategorySchema(value) && <CategoryOverview category={value} />}
+      {isPersonSchema(value) && <PersonOverview person={value} />}
+    </CardContent>
     <CardActions>
       <IconButton onClick={() => navigate(`/${table}/${entityId}`)}>
         <EditIcon />
