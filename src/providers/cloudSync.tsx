@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { useCloudAuth } from './cloudAuth';
-import { DbBackup, useDB } from './db';
+import { useDB } from './db';
 import Axios from 'axios';
 import { useAppContext } from './state';
+import { BackupSchema, BackupV1Schema } from '../types/db.dto';
 
 interface CloudSyncContextInterface {
   sync: () => void;
@@ -58,16 +59,24 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
 
       const existingFile = existingFiles.data.files?.find((x: any) => x.name === BACKUP_FILENAME);
 
-      let existingBackup = {} as DbBackup;
+      let existingBackup = {} as BackupSchema;
 
       if (existingFile?.id) {
-        const fileContent = await drive.get<DbBackup>(`/files/${existingFile.id}`, {
+        const fileContent = await drive.get(`/files/${existingFile.id}`, {
           params: {
             alt: 'media'
           },
         });
 
-        existingBackup = fileContent.data;
+        console.info(`Parsing data ${JSON.stringify(fileContent.data, null, 2)}`)
+
+        if ('version' in fileContent.data) {
+          console.info(`Found backup version ${fileContent.data.version}`);
+          existingBackup = BackupSchema.parse(fileContent.data.data);
+        } else {
+          console.info(`Found legacy backup`);
+          existingBackup = BackupV1Schema.parse(fileContent.data);
+        }
 
         console.info(`Existing backup loaded`);
         console.dir(existingBackup);

@@ -17,7 +17,6 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useTable } from '../../hooks/table';
-import { TableNames } from '../../providers/db';
 import { CoverageSchema, CoverageValue } from '../../types/coverage.dto';
 import { EntitySelector } from '../EntitySelector';
 
@@ -64,7 +63,7 @@ export const CoverageEditor: React.FC<CoverageEditorProps> = ({ value, onChange 
 };
 
 export const EditCoverageDialog: React.FC<EditCoverageDialogProps> = ({ coverageId, planId, categoryId, onClose }) => {
-  const { get: getCoverage } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES });
+  const { get: getCoverage } = useTable<CoverageSchema>({ tableName: 'coverage' });
   const [coverage, setCoverage] = React.useState<CoverageSchema | null>(null);
 
   React.useEffect(() => {
@@ -87,8 +86,8 @@ export const EditCoverageDialog: React.FC<EditCoverageDialogProps> = ({ coverage
       {coverage && <Stack spacing={2} sx={{ my: 2 }}>
 
         <Stack direction='row' spacing={2}>
-          {planId && <EntitySelector sx={{ flex: 3 }} table={TableNames.CATEGORIES} value={coverage.categoryId} onChange={(categoryId) => setCoverage((value) => ({ ...value!, categoryId: categoryId! }))} label={'Category'} />}
-          {categoryId && <EntitySelector sx={{ flex: 3 }} table={TableNames.PLANS} value={coverage.planId} onChange={(planId) => setCoverage((value) => ({ ...value!, planId: planId! }))} label={'Plan'} />}
+          {planId && <EntitySelector sx={{ flex: 3 }} table='category' value={coverage.categoryId} onChange={(categoryId) => setCoverage((value) => ({ ...value!, categoryId: categoryId! }))} label={'Category'} />}
+          {categoryId && <EntitySelector sx={{ flex: 3 }} table="plan" value={coverage.planId} onChange={(planId) => setCoverage((value) => ({ ...value!, planId: planId! }))} label={'Plan'} />}
 
           <FormControlLabel control={<Switch checked={coverage.isInNetwork} onChange={(event) => setCoverage((value) => ({ ...value!, isInNetwork: event.target.checked }))} />} label="In Network" />
 

@@ -7,7 +7,6 @@ import ExpenseIcon from "@mui/icons-material/AttachMoneyRounded";
 import SaveIcon from "@mui/icons-material/SaveRounded";
 import { ulid } from 'ulidx';
 import { useTable } from '../../hooks/table';
-import { TableNames } from '../../providers/db';
 import { ExpenseSchema } from '../../types/expense.dto';
 import { ExpenseList } from './expenseList';
 import { ExpandCircleDownRounded } from '@mui/icons-material';
@@ -24,9 +23,9 @@ import Fab from '@mui/material/Fab';
 
 
 export const EditPersonPage: React.FC = () => {
-  const { get, save } = useTable<PersonSchema>({ tableName: TableNames.PEOPLE });
+  const { get, save } = useTable<PersonSchema>({ tableName: 'person' });
   const { personId } = useParams();
-  const { save: createExpense } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES });
+  const { save: saveExpense } = useTable<ExpenseSchema>({ tableName: 'expense' });
 
   const [person, setPerson] = React.useState<PersonSchema | null>(null);
   const { setTitle } = useAppContext();
@@ -58,15 +57,10 @@ export const EditPersonPage: React.FC = () => {
 
   const onAddExpense = async () => {
     // TODO: Use an edit dialog instead of creating a new expense
-    createExpense({
-      id: ulid(),
+    saveExpense(ExpenseSchema.parse({
       name: 'New Expense',
-      months: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-      amount: 0,
       personId: personId!,
-      categoryId: '',
-      type: TableNames.EXPENSES,
-    });
+    }));
   };
 
   return <Stack spacing={2}>

@@ -6,7 +6,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import SaveIcon from "@mui/icons-material/SaveRounded";
 import { ExpandCircleDownRounded } from "@mui/icons-material";
 import { useTable } from "../../hooks/table";
-import { TableNames } from "../../providers/db";
 import { PlanLimitEditor } from "./limitEditor";
 import { CoverageList } from "../../components/CoverageList";
 import Stack from "@mui/material/Stack";
@@ -24,7 +23,7 @@ import useTheme from "@mui/material/styles/useTheme";
 export const EditPlanPage: React.FC = () => {
   const { setTitle } = useAppContext();
   const [plan, setPlan] = React.useState<PlanSchema | null>(null);
-  const { get: getPlan, save: savePlan } = useTable<PlanSchema>({ tableName: TableNames.PLANS });
+  const { get: getPlan, save: savePlan } = useTable<PlanSchema>({ tableName: 'plan' });
   const { planId } = useParams();
   const theme = useTheme();
   const navigate = useNavigate();

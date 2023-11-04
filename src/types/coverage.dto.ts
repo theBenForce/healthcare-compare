@@ -1,5 +1,4 @@
 import z from 'zod';
-import { TableNames } from '../providers/db';
 
 export const CoverageType = z.union([
   z.literal('copay'),
@@ -22,7 +21,7 @@ export const CoverageSchema = z.object({
   isInNetwork: z.boolean().optional(),
   beforeDeductible: CoverageValue.default(CoverageValue.parse({})),
   afterDeductible: CoverageValue.default(CoverageValue.parse({})),
-  type: z.literal(TableNames.COVERAGES).default(TableNames.COVERAGES),
+  type: z.literal('coverage'),
 });
 
 export type CoverageSchema = z.infer<typeof CoverageSchema>;

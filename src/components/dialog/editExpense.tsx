@@ -2,7 +2,6 @@ import React from 'react';
 
 import Dialog from '@mui/material/Dialog';
 import { useTable } from '../../hooks/table';
-import { TableNames } from '../../providers/db';
 import { ExpenseSchema } from '../../types/expense.dto';
 import { DollarField } from '../DollarField';
 import { EntitySelector } from '../EntitySelector';
@@ -25,7 +24,7 @@ interface EditExpenseDialogProps {
 
 export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({ expenseId, onClose, personId, categoryId }) => {
   const [expense, setExpense] = React.useState<ExpenseSchema | null>(null);
-  const { save, get } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES });
+  const { save, get } = useTable<ExpenseSchema>({ tableName: 'expense' });
 
   React.useEffect(() => {
     if (!expenseId) return;
@@ -57,8 +56,8 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({ expenseId,
       <Stack spacing={2} sx={{ my: 2 }}>
         <TextField label="Name" value={expense?.name} onChange={(event) => setExpense(value => ({ ...value!, name: event.target.value }))} />
 
-        {!categoryId && <EntitySelector label="Category" value={expense?.categoryId ?? null} onChange={(categoryId) => setExpense(value => ({ ...value!, categoryId: categoryId ?? '' }))} table={TableNames.CATEGORIES} />}
-        {!personId && <EntitySelector label="Person" value={expense?.personId ?? null} onChange={(personId) => setExpense(value => ({ ...value!, personId: personId ?? '' }))} table={TableNames.PEOPLE} />}
+        {!categoryId && <EntitySelector label="Category" value={expense?.categoryId ?? null} onChange={(categoryId) => setExpense(value => ({ ...value!, categoryId: categoryId ?? '' }))} table='category' />}
+        {!personId && <EntitySelector label="Person" value={expense?.personId ?? null} onChange={(personId) => setExpense(value => ({ ...value!, personId: personId ?? '' }))} table='person' />}
         <DollarField
           label="Monthly Amount"
           value={expense?.amount}

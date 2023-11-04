@@ -76,14 +76,17 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
     },
     scope: SCOPE.join(' '),
     prompt: 'none',
+    hint: credential?.credential,
     error_callback(nonOAuthError) {
       console.error(`Non OAuth Error logging in with Google: ${JSON.stringify(nonOAuthError, null, 2)}`);
     },
   });
 
   React.useEffect(() => {
-    if (!credential || !loginWithGoogle || !credential) return;
+    if (!credential || !loginWithGoogle) return;
     const expiresAt = authToken?.expires_at ?? 0;
+
+    console.info(`Checking if auth token is expired (${new Date(expiresAt).toLocaleString()} - ${new Date(Date.now()).toLocaleString()} = ${expiresAt - Date.now()})`);
     if (expiresAt > Date.now()) return;
 
     console.info(`Refreshing auth token...`);
@@ -102,10 +105,11 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
   }, [authToken, credential?.credential, loginWithGoogle]);
 
   useGoogleOneTapLogin({
-    disabled: authToken !== null || !syncEnabled,
+    disabled: (authToken?.expires_at ?? 0) > Date.now() || !syncEnabled,
     onSuccess(response) {
       console.info(`Logged in with Google One Tap`)
       if (response.credential) {
+        console.info(`Saving credential to local storage`);
         localStorage.setItem('googleCredential', JSON.stringify(response));
       }
 
@@ -114,7 +118,7 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
     onError() {
       console.error(`Error logging in with Google One Tap`);
     },
-  })
+  });
 
   React.useEffect(() => {
     if (!syncEnabled) return;
