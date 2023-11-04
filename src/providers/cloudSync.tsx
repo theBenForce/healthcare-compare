@@ -27,7 +27,7 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
   const { authToken } = useCloudAuth();
   const [syncInterval, setSyncInterval] = React.useState<NodeJS.Timeout | null>(null);
   const { mergeStates } = useDB();
-  const { isModified } = useAppContext();
+  const { isModified, setIsModified } = useAppContext();
 
   const isSyncEnabled = React.useMemo(() => Boolean(authToken?.access_token), [authToken?.access_token]);
 
@@ -119,13 +119,15 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
     };
 
     handler().then((result) => {
+
+      setIsModified(false);
       console.info(`Sync complete`);
 
       console.dir({ result });
     }).finally(() => {
       setIsSyncing(false);
     });
-  }, [mergeStates, authToken, drive]);
+  }, [mergeStates, authToken, drive, setIsModified]);
 
   React.useEffect(() => {
     if (!isSyncEnabled) return;
