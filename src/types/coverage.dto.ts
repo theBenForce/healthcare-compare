@@ -1,3 +1,4 @@
+import { ulid } from 'ulidx';
 import z from 'zod';
 
 export const CoverageType = z.union([
@@ -15,13 +16,13 @@ export const CoverageValue = z.object({
 export type CoverageValue = z.infer<typeof CoverageValue>;
 
 export const CoverageSchema = z.object({
-  id: z.string().default(''),
-  planId: z.string().ulid(),
-  categoryId: z.string().ulid(),
+  id: z.string().default(() => ulid()),
+  planId: z.string().ulid().or(z.null()).default(null),
+  categoryId: z.string().ulid().or(z.null()).default(null),
   isInNetwork: z.boolean().optional(),
   beforeDeductible: CoverageValue.default(CoverageValue.parse({})),
   afterDeductible: CoverageValue.default(CoverageValue.parse({})),
-  type: z.literal('coverage'),
+  type: z.literal('coverage').default('coverage'),
 });
 
 export type CoverageSchema = z.infer<typeof CoverageSchema>;
