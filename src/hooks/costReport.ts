@@ -1,7 +1,6 @@
 import React from "react";
 import { CostReport } from "../types/costReport.dto";
 import { useTable } from "./table";
-import { TableNames } from "../providers/db";
 import { PlanSchema } from "../types/plan.dto";
 import { PersonSchema } from "../types/person.dto";
 import { ExpenseSchema } from "../types/expense.dto";
@@ -9,10 +8,10 @@ import { CoverageSchema } from "../types/coverage.dto";
 
 export const useCostReport = (): CostReport => {
   const [report, setReport] = React.useState<CostReport>([]);
-  const { list: listPlans } = useTable<PlanSchema>({ tableName: TableNames.PLANS });
-  const { list: listPeople } = useTable<PersonSchema>({ tableName: TableNames.PEOPLE });
-  const { list: listCoverages } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES });
-  const {list: listExpenses} = useTable<ExpenseSchema>({tableName: TableNames.EXPENSES});
+  const { list: listPlans } = useTable<PlanSchema>({ tableName: 'plan' });
+  const { list: listPeople } = useTable<PersonSchema>({ tableName: 'person' });
+  const { list: listCoverages } = useTable<CoverageSchema>({ tableName: 'coverage' });
+  const {list: listExpenses} = useTable<ExpenseSchema>({tableName: 'expense'});
 
   React.useEffect(() => {
     listPlans().then(async (plans) => {

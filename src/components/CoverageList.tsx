@@ -5,7 +5,6 @@ import { DataGrid, GridActionsCellItem, GridColDef, GridColumnGroupingModel } fr
 import React from 'react';
 import { useCoverages } from '../hooks/coverages';
 import { useTable } from '../hooks/table';
-import { TableNames } from '../providers/db';
 import { CategorySchema } from '../types/category.dto';
 import { CoverageSchema, CoverageType } from '../types/coverage.dto';
 import { PlanSchema } from '../types/plan.dto';
@@ -65,12 +64,12 @@ const columnGroupingModel: GridColumnGroupingModel = [
 ];
 
 export const CoverageList: React.FC<CoverageListParams> = ({ planId, categoryId }) => {
-  const { remove, save } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES });
+  const { remove, save } = useTable<CoverageSchema>({ tableName: 'coverage' });
   const { coverages } = useCoverages({ planId, categoryId });
   const [editingCoverageId, setEditingCoverageId] = React.useState<string | null>(null);
 
-  const { values: plans } = useTable<PlanSchema>({ tableName: TableNames.PLANS });
-  const { values: categories } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
+  const { values: plans } = useTable<PlanSchema>({ tableName: 'plan' });
+  const { values: categories } = useTable<CategorySchema>({ tableName: 'category' });
 
   const onSaveCoverage = React.useCallback(async (value?: CoverageSchema) => {
     setEditingCoverageId(null);

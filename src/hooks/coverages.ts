@@ -1,6 +1,5 @@
 import React from 'react';
 import { ulid } from 'ulidx';
-import { TableNames } from '../providers/db';
 import { CategorySchema } from '../types/category.dto';
 import { CoverageSchema } from '../types/coverage.dto';
 import { PlanSchema } from '../types/plan.dto';
@@ -14,9 +13,9 @@ interface UseCoveragesParams {
 
 export const useCoverages = ({planId, categoryId}: UseCoveragesParams) => {
   const [coverages, setCoverages] = React.useState<Array<CoverageSchema>>([]);
-  const { values: savedCoverages } = useTable<CoverageSchema>({ tableName: TableNames.COVERAGES, filter: { planId, categoryId } });
-  const { values: plans } = useTable<PlanSchema>({ tableName: TableNames.PLANS });
-  const { values: categories } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
+  const { values: savedCoverages } = useTable<CoverageSchema>({ tableName: 'coverage', filter: { planId, categoryId } });
+  const { values: plans } = useTable<PlanSchema>({ tableName: 'plan' });
+  const { values: categories } = useTable<CategorySchema>({ tableName: 'category' });
   
   React.useEffect(() => {
     const handler = async () => {

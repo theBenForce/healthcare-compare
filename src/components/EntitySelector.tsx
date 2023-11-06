@@ -1,10 +1,10 @@
 import React from 'react';
-import { TableNames } from '../providers/db';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useTable } from '../hooks/table';
-import { BaseSchema } from '../types/base.dto';
+import { TableNames } from '../types/base.dto';
 import type { SxProps } from '@mui/material';
+import { AllDbTypes, isBaseEntity } from '../types/db.dto';
 
 interface EntitySelectorParams {
   value: string;
@@ -16,13 +16,20 @@ interface EntitySelectorParams {
 
 
 export const EntitySelector: React.FC<EntitySelectorParams> = ({ value, onChange, table, label, sx }) => {
-  const { values } = useTable<BaseSchema>({ tableName: table });
+  const { values } = useTable<AllDbTypes>({ tableName: table });
 
   return <Autocomplete
     sx={sx}
     renderInput={(params) => <TextField {...params} label={label} />}
     value={value}
     options={values.map(x => x.id)}
-    getOptionLabel={entityId => values.find(x => x.id === entityId)?.name ?? ''}
+    getOptionLabel={entityId => {
+      const entry = values.find(x => x.id === entityId);
+      if (isBaseEntity(entry)) {
+        return entry.name;
+      }
+
+      return entityId;
+    }}
     onChange={(_event, entityId) => onChange(entityId)} />;
 }

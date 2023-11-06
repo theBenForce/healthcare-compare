@@ -1,8 +1,9 @@
 import React from 'react';
-import { TableNames, useDB } from '../providers/db';
-import { BaseSchema } from '../types/base.dto';
+import { useDB } from '../providers/db';
+import { BaseSchema, TableNames } from '../types/base.dto';
 import { CoverageSchema } from '../types/coverage.dto';
 import { useAppContext } from '../providers/state';
+import { AllDbTypes } from '../types/db.dto';
 
 type RecordFilter = Record<string, string | undefined>;
 
@@ -15,17 +16,17 @@ export interface TableContextInterface<SchemaType extends BaseSchema | CoverageS
 }
 
 interface UseTableParams {
-  tableName: `${TableNames}`;
+  tableName: TableNames;
   filter?: RecordFilter;
 }
 
-export const useTable = <TableSchema extends BaseSchema | CoverageSchema>({ tableName, filter }: UseTableParams): TableContextInterface<TableSchema> => {
+export const useTable = <TableSchema extends AllDbTypes>({ tableName, filter }: UseTableParams): TableContextInterface<TableSchema> => {
   const { db } = useDB();
   const [values, setValues] = React.useState<TableSchema[]>([]);
   const [baseFilter] = React.useState<RecordFilter | null>(filter ?? null);
   const { setIsModified } = useAppContext();
 
-  const list = React.useCallback(async (filterOverride?: RecordFilter) => {
+  const list = React.useCallback(async (filterOverride?: RecordFilter): Promise<Array<TableSchema>> => {
     console.info(`Listing ${tableName}`);
     
     let result: TableSchema[] | undefined = undefined;
@@ -49,7 +50,7 @@ export const useTable = <TableSchema extends BaseSchema | CoverageSchema>({ tabl
     }
     
     setValues(result ?? []);
-    return (result ?? []) as Array<TableSchema>;
+    return (result ?? []).map(record => AllDbTypes.parse(record) as TableSchema);
   }, [db, tableName, baseFilter]);
 
   const remove = React.useCallback(async (id: string) => {
@@ -58,9 +59,11 @@ export const useTable = <TableSchema extends BaseSchema | CoverageSchema>({ tabl
     setIsModified(true);
   }, [db, tableName, values, setIsModified]);
 
-  const get = React.useCallback(async (id: string) => {
+  const get = React.useCallback(async (id: string): Promise<TableSchema | null> => {
     console.info(`get ${tableName} ${id}`);
-    return db?.get(tableName, id)?.then((value) => ({...value, type: tableName}) || null);
+    const result = await db?.get(tableName, id)?.then((value) => AllDbTypes.parse({ ...value, type: tableName }) as TableSchema);
+    
+    return result ?? null;
   }, [db, tableName]);
 
   const save = React.useCallback(async (entity: TableSchema) => {
@@ -68,16 +71,21 @@ export const useTable = <TableSchema extends BaseSchema | CoverageSchema>({ tabl
 
     const existing = await db.getKey(tableName, entity.id);
 
+    const record = AllDbTypes.parse({
+      ...entity,
+      updatedAt: new Date(),
+      type: tableName
+    }) as TableSchema;
+
     if (existing) {
-      await db?.put(tableName, entity);
+      await db?.put(tableName, record);
     } else {
-      await db?.add(tableName, entity);
+      await db?.add(tableName, record);
     }
 
     setIsModified(true);
 
-    
-    setValues([...values.filter(x => x.id !== entity.id), entity]);
+    setValues([...values.filter(x => x.id !== record.id), record]);
 
   }, [db, tableName, setIsModified, values]);
 

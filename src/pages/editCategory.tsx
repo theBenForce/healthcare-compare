@@ -8,7 +8,6 @@ import SaveIcon from "@mui/icons-material/SaveRounded";
 import { ulid } from 'ulidx';
 import { CoverageList } from '../components/CoverageList';
 import { useTable } from '../hooks/table';
-import { TableNames } from '../providers/db';
 import { CategorySchema } from '../types/category.dto';
 import { ExpenseSchema } from '../types/expense.dto';
 import { ExpenseList } from './personEdit/expenseList';
@@ -25,13 +24,13 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Fab from '@mui/material/Fab';
 
 export const EditCategoryPage: React.FC = () => {
-  const { get, save } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
+  const { get, save } = useTable<CategorySchema>({ tableName: 'category' });
   const { id } = useParams();
   const [category, setCategory] = React.useState<CategorySchema | null>(null);
   const { setTitle } = useAppContext();
   const theme = useTheme();
   const navigate = useNavigate();
-  const { save: createExpense } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES });
+  const { save: saveExpense } = useTable<ExpenseSchema>({ tableName: 'expense' });
   const { t } = useTranslation();
 
   React.useEffect(() => {
@@ -59,15 +58,10 @@ export const EditCategoryPage: React.FC = () => {
 
   const onAddExpense = async () => {
     // TODO: Use an edit dialog instead of creating a new expense
-    createExpense({
-      id: ulid(),
+    saveExpense(ExpenseSchema.parse({
       name: 'New Expense',
-      months: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-      amount: 0,
-      personId: '',
       categoryId: id!,
-      type: TableNames.EXPENSES,
-    });
+    }));
   };
 
   return <Stack spacing={2}>

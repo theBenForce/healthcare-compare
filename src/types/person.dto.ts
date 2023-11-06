@@ -1,9 +1,8 @@
 import z from 'zod';
 import { BaseSchema } from './base.dto';
-import { TableNames } from '../providers/db';
 
 export const PersonSchema = BaseSchema.extend({
-  type: z.literal(TableNames.PEOPLE),
+  type: z.literal("person"),
 });
 
 export type PersonSchema = z.infer<typeof PersonSchema>;

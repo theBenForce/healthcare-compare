@@ -12,16 +12,15 @@ import IconButton from '@mui/material/IconButton';
 import { useNavigate } from 'react-router-dom';
 import { EditExpenseDialog } from '../../components/dialog/editExpense';
 import { useTable } from '../../hooks/table';
-import { TableNames } from '../../providers/db';
 import { CategorySchema } from '../../types/category.dto';
 import { ExpenseSchema } from '../../types/expense.dto';
 import { PersonSchema } from '../../types/person.dto';
 
 
 export const ExpenseList: React.FC<{ personId?: string; categoryId?: string }> = ({ personId, categoryId }) => {
-  const { values, remove } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES, filter: { personId, categoryId } });
-  const { values: categories } = useTable<CategorySchema>({ tableName: TableNames.CATEGORIES });
-  const { values: people } = useTable<PersonSchema>({ tableName: TableNames.PEOPLE });
+  const { values, remove } = useTable<ExpenseSchema>({ tableName: 'expense', filter: { personId, categoryId } });
+  const { values: categories } = useTable<CategorySchema>({ tableName: 'category' });
+  const { values: people } = useTable<PersonSchema>({ tableName: 'person' });
   const [selectedExpense, setSelectedExpense] = React.useState<string | null>(null);
   const navigate = useNavigate();
 

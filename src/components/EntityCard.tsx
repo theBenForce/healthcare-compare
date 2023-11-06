@@ -1,25 +1,25 @@
-import React from 'react';
-import { TableNames } from '../providers/db';
-import Grid from '@mui/material/Unstable_Grid2';
-import { useTable } from '../hooks/table';
-import { useNavigate } from 'react-router-dom';
-import { BaseSchema } from '../types/base.dto';
-import CardHeader from '@mui/material/CardHeader';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import { PlanSchema, isPlanSchema } from '../types/plan.dto';
-import Paper from '@mui/material/Paper';
-import Chip from '@mui/material/Chip';
-import CardActions from '@mui/material/CardActions';
-import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/EditRounded';
 import DeleteIcon from '@mui/icons-material/DeleteRounded';
+import EditIcon from '@mui/icons-material/EditRounded';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
+import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Unstable_Grid2';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTable } from '../hooks/table';
 import { CategorySchema, isCategorySchema } from '../types/category.dto';
+import { AllDbTypes, isBaseEntity } from '../types/db.dto';
 import { ExpenseSchema } from '../types/expense.dto';
 import { PersonSchema, isPersonSchema } from '../types/person.dto';
+import { PlanSchema, isPlanSchema } from '../types/plan.dto';
+import { TableNames } from '../types/base.dto';
 
 interface EntityCardParams {
-  table: `${TableNames}`;
+  table: TableNames;
   entityId: string;
 }
 
@@ -35,7 +35,7 @@ const PlanOverview: React.FC<{ plan: PlanSchema }> = ({ plan }) => {
 };
 
 const CategoryOverview: React.FC<{ category: CategorySchema }> = ({ category }) => {
-  const { values: expenses } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES, filter: { categoryId: category.id } });
+  const { values: expenses } = useTable<ExpenseSchema>({ tableName: 'expense', filter: { categoryId: category.id } });
 
   const total = expenses.reduce((acc, expense) => acc + expense.amount, 0);
 
@@ -45,7 +45,7 @@ const CategoryOverview: React.FC<{ category: CategorySchema }> = ({ category }) 
 };
 
 const usePersonExpenses = (personId: string) => {
-  const { values: expenses } = useTable<ExpenseSchema>({ tableName: TableNames.EXPENSES, filter: { personId } });
+  const { values: expenses } = useTable<ExpenseSchema>({ tableName: 'expense', filter: { personId } });
 
   const total = React.useMemo(() => expenses.reduce((acc, expense) => acc + expense.amount, 0), [expenses]);
 
@@ -60,9 +60,9 @@ const PersonOverview: React.FC<{ person: PersonSchema }> = ({ person }) => {
   </Paper>;
 };
 
-const useEntity = (table: `${TableNames}`, entityId: string) => {
-  const { get } = useTable<BaseSchema>({ tableName: table });
-  const [value, setValue] = React.useState<BaseSchema | null>(null);
+const useEntity = (table: TableNames, entityId: string) => {
+  const { get } = useTable<AllDbTypes>({ tableName: table });
+  const [value, setValue] = React.useState<AllDbTypes | null>(null);
 
   React.useEffect(() => {
     if (!entityId) return;
@@ -75,7 +75,7 @@ const useEntity = (table: `${TableNames}`, entityId: string) => {
 };
 
 export const EntityCard: React.FC<EntityCardParams> = ({ table, entityId }) => {
-  const { remove } = useTable<BaseSchema>({ tableName: table });
+  const { remove } = useTable<AllDbTypes>({ tableName: table });
   const navigate = useNavigate();
   const { value } = useEntity(table, entityId);
 
@@ -83,22 +83,24 @@ export const EntityCard: React.FC<EntityCardParams> = ({ table, entityId }) => {
     remove(id);
   }
 
-  return <Grid xs={12} sm={6} md={4} lg={3}><Card>
-    <CardHeader
-      title={value?.name ?? 'Loading...'}
-      subheader={value?.description} />
-    <CardContent>
-      {isPlanSchema(value) && <PlanOverview plan={value} />}
-      {isCategorySchema(value) && <CategoryOverview category={value} />}
-      {isPersonSchema(value) && <PersonOverview person={value} />}
-    </CardContent>
-    <CardActions>
-      <IconButton onClick={() => navigate(`/${table}/${entityId}`)}>
-        <EditIcon />
-      </IconButton>
-      <IconButton onClick={() => onDelete(entityId)}>
-        <DeleteIcon />
-      </IconButton>
-    </CardActions>
-  </Card></Grid>;
+  return <Grid xs={12} sm={6} md={4} lg={3}>
+    <Card>
+      {value && isBaseEntity(value) && <CardHeader
+        title={value?.name ?? 'Loading...'}
+        subheader={value?.description} />}
+      <CardContent>
+        {isPlanSchema(value) && <PlanOverview plan={value} />}
+        {isCategorySchema(value) && <CategoryOverview category={value} />}
+        {isPersonSchema(value) && <PersonOverview person={value} />}
+      </CardContent>
+      <CardActions>
+        <IconButton onClick={() => navigate(`/${table}/${entityId}`)}>
+          <EditIcon />
+        </IconButton>
+        <IconButton onClick={() => onDelete(entityId)}>
+          <DeleteIcon />
+        </IconButton>
+      </CardActions>
+    </Card>
+  </Grid>;
 }

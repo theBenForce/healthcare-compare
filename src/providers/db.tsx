@@ -1,29 +1,21 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React from 'react';
 import { IDBPDatabase, openDB } from 'idb';
 import merge from 'lodash.merge';
+import { BackupLatestSchema, BackupSchema, convertBackupToLatest, isBaseEntity } from '../types/db.dto';
+import { TableNames } from '../types/base.dto';
 
-
-
-export enum TableNames {
-  PLANS = 'plan',
-  PEOPLE = 'person',
-  CATEGORIES = 'category',
-  EXPENSES = 'expense',
-  COVERAGES = 'coverage',
-}
-
-export type DbBackup = Record<`${TableNames}`, Array<unknown>>;
 
 interface DBContextInterface {
   db: IDBPDatabase | null;
-  createBackup: () => Promise<DbBackup>;
-  mergeStates: (backup: DbBackup) => Promise<DbBackup>;
+  createBackup: () => Promise<BackupLatestSchema>;
+  mergeStates: (backup: BackupSchema) => Promise<BackupLatestSchema>;
 }
 
 export const DBContext = React.createContext<DBContextInterface>({
   db: null,
-  createBackup: async () => ({} as DbBackup),
-  mergeStates: async () => ({} as DbBackup),
+  createBackup: async () => ({} as BackupLatestSchema),
+  mergeStates: async () => ({} as BackupLatestSchema),
 });
 
 export const useDB = () => React.useContext(DBContext);
@@ -40,10 +32,10 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
           if (!database.objectStoreNames.contains(tableName)) {
             const table = database.createObjectStore(tableName, { keyPath: 'id' });
 
-            if (tableName === TableNames.EXPENSES) {
+            if (tableName === 'expense') {
               table.createIndex('personId', 'personId');
               table.createIndex('categoryId', 'categoryId');
-            } else if (tableName === TableNames.COVERAGES) {
+            } else if (tableName === 'coverage') {
               table.createIndex('planId', 'planId');
               table.createIndex('categoryId', 'categoryId');
             }
@@ -51,7 +43,7 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
         }
 
         if (oldVersion < 2) {
-          const plans = transaction.objectStore(TableNames.PLANS);
+          const plans = transaction.objectStore('plan');
           const allPlans = await plans.getAll();
 
           for (const plan of allPlans) {
@@ -67,29 +59,45 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const createBackup = React.useCallback(async () => {
-    const storeNames = Object.values(TableNames);
-    const backup = {} as DbBackup;
+    console.info(`Creating backup`);
+    const storeNames = Object.values(TableNames.enum);
+    const backup = BackupLatestSchema.parse({});
 
     for (const storeName of storeNames) {
       if (!db?.objectStoreNames.contains(storeName)) continue;
 
       const data = await db?.getAll(storeName);
-      backup[storeName] = data ?? [];
+      backup.tables[storeName] = Object.fromEntries(data.map(entry => [entry.id, entry]));
     }
 
     return backup;
   }, [db]);
 
-  const mergeStates = React.useCallback(async (backupValues: DbBackup): Promise<DbBackup> => {
-    const existingData = await createBackup();
-    const backup = merge(existingData, backupValues);
-    const transaction = db?.transaction(Object.keys(backup), 'readwrite');
-    const storeNames = Object.values(TableNames);
+  const mergeStates = React.useCallback(async (backupValues: BackupSchema): Promise<BackupLatestSchema> => {
+    const result = await createBackup();
+    const backup = convertBackupToLatest(backupValues);
+
+    const allKeys = new Set(Object.keys(result.tables).concat(Object.keys(backup.tables))) as Set<TableNames>;
+
+    for (const storeName of allKeys) {
+      const itemIds = new Set(Object.keys(result.tables[storeName] ?? {}).concat(Object.keys(backup.tables[storeName] ?? {})));
+
+      for (const itemId of itemIds) {
+        const resultItem = result.tables[storeName]?.[itemId];
+        const backupItem = backup.tables[storeName]?.[itemId];
+
+        // @ts-ignore
+        result.tables[storeName]![itemId] = merge(resultItem ?? {}, backupItem ?? {});
+      }
+    }
+
+    const transaction = db?.transaction(Object.keys(result.tables), 'readwrite');
+    const storeNames = Object.values(TableNames.enum);
 
     if (transaction) {
       for (const storeName of storeNames) {
         const store = transaction.objectStore(storeName);
-        const data = backup[storeName] as Array<unknown>;
+        const data = Object.values(result.tables[storeName] ?? {});
 
         for (const item of data) {
           await store.put(item);
@@ -99,7 +107,7 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
       await transaction.done;
     }
 
-    return backup;
+    return result;
   }, [db, createBackup]);
 
   return (
