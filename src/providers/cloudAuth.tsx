@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { CredentialResponse, TokenResponse, googleLogout, useGoogleLogin, useGoogleOneTapLogin } from '@react-oauth/google';
+import { CredentialResponse, GoogleLogin, TokenResponse, googleLogout, useGoogleLogin, useGoogleOneTapLogin } from '@react-oauth/google';
 import React, { PropsWithChildren } from 'react';
 import Axios from 'axios';
 import { useFlag } from './featureFlags';
+import { Logger } from '../util/logger';
 
 
 export interface UserProfile {
@@ -51,34 +52,34 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
         }
       })
       .then((res) => {
-        console.dir(res.data);
+        Logger.dir(res.data);
         setProfile(res.data);
         localStorage.setItem('profile', JSON.stringify(res.data));
       })
-      .catch((err) => console.log(err));
+      .catch((err) => Logger.error(err));
 
   }, [authToken, profile]);
 
   const loginWithGoogle = useGoogleLogin({
     flow: 'implicit',
     onSuccess: (response: Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>) => {
-      console.info(`Logged in with Google: ${JSON.stringify(response, null, 2)}`);
+      Logger.info(`Logged in with Google: ${JSON.stringify(response, null, 2)}`);
       const persistedToken = { ...response, expires_at: Date.now() + response.expires_in * 1000 };
       setAuthToken(persistedToken);
 
       localStorage.setItem('authToken', JSON.stringify(persistedToken));
     },
     onError(errorResponse) {
-      console.error(`Error logging in with Google: ${JSON.stringify(errorResponse, null, 2)}`);
+      Logger.error(`Error logging in with Google: ${JSON.stringify(errorResponse, null, 2)}`);
     },
     onNonOAuthError(nonOAuthError) {
-      console.error(`Non OAuth Error logging in with Google: ${JSON.stringify(nonOAuthError, null, 2)}`);
+      Logger.error(`Non OAuth Error logging in with Google: ${JSON.stringify(nonOAuthError, null, 2)}`);
     },
     scope: SCOPE.join(' '),
     prompt: 'none',
     hint: credential?.credential,
     error_callback(nonOAuthError) {
-      console.error(`Non OAuth Error logging in with Google: ${JSON.stringify(nonOAuthError, null, 2)}`);
+      Logger.error(`Non OAuth Error logging in with Google: ${JSON.stringify(nonOAuthError, null, 2)}`);
     },
   });
 
@@ -86,10 +87,10 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
     if (!credential || !loginWithGoogle) return;
     const expiresAt = authToken?.expires_at ?? 0;
 
-    console.info(`Checking if auth token is expired (${new Date(expiresAt).toLocaleString()} - ${new Date(Date.now()).toLocaleString()} = ${expiresAt - Date.now()})`);
+    Logger.info(`Checking if auth token is expired (${new Date(expiresAt).toLocaleString()} - ${new Date(Date.now()).toLocaleString()} = ${expiresAt - Date.now()})`);
     if (expiresAt > Date.now()) return;
 
-    console.info(`Refreshing auth token...`);
+    Logger.info(`Refreshing auth token...`);
 
     loginWithGoogle({
       hint: credential.credential,
@@ -104,21 +105,28 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
     })
   }, [authToken, credential?.credential, loginWithGoogle]);
 
-  useGoogleOneTapLogin({
-    disabled: (authToken?.expires_at ?? 0) > Date.now() || !syncEnabled,
-    onSuccess(response) {
-      console.info(`Logged in with Google One Tap`)
-      if (response.credential) {
-        console.info(`Saving credential to local storage`);
-        localStorage.setItem('googleCredential', JSON.stringify(response));
-      }
+  const oneTapDisabled = React.useMemo(() => {
+    const result = !syncEnabled || (authToken?.expires_at ?? 0) > Date.now();
+    Logger.info(`One tap disabled: ${result}`);
+    return result;
+  }, [syncEnabled, authToken?.expires_at]);
 
-      setCredential(response ?? null);
-    },
-    onError() {
-      console.error(`Error logging in with Google One Tap`);
-    },
-  });
+  // useGoogleOneTapLogin({
+  //   state_cookie_domain: 'localhost',
+  //   disabled: oneTapDisabled,
+  //   onSuccess(response) {
+  //     Logger.info(`Logged in with Google One Tap`)
+  //     if (response.credential) {
+  //       Logger.info(`Saving credential to local storage`);
+  //       localStorage.setItem('googleCredential', JSON.stringify(response));
+  //     }
+
+  //     setCredential(response ?? null);
+  //   },
+  //   onError() {
+  //     Logger.error(`Error logging in with Google One Tap`);
+  //   },
+  // });
 
   React.useEffect(() => {
     if (!syncEnabled) return;
@@ -126,17 +134,17 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
     const profile = JSON.parse(localStorage.getItem('profile') ?? 'null');
     const googleCredential = JSON.parse(localStorage.getItem('googleCredential') ?? 'null');
     if (profile) {
-      console.info(`Setting profile from local storage: ${profile.name}`);
+      Logger.info(`Setting profile from local storage: ${profile.name}`);
       setProfile(profile);
     }
 
     if (auth?.access_token) {
-      console.info(`Setting auth token from local storage`);
+      Logger.info(`Setting auth token from local storage`);
       setAuthToken(auth);
     }
 
     if (googleCredential) {
-      console.info(`Setting credential from local storage`);
+      Logger.info(`Setting credential from local storage`);
       setCredential(googleCredential);
     }
   }, [loginWithGoogle, syncEnabled]);
@@ -155,5 +163,8 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
     setProfile(null);
   };
 
-  return <cloudAuthContext.Provider value={{ authToken, signOut, signIn, profile }} children={children} />;
+  return <cloudAuthContext.Provider value={{ authToken, signOut, signIn, profile }}>
+    <GoogleLogin onSuccess={response => Logger.dir(response)} onError={() => Logger.error('Login failed')} useOneTap shape='circle' />
+    {children}
+  </cloudAuthContext.Provider>;
 }

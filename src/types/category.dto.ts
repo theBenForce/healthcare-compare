@@ -1,7 +1,7 @@
 import z from 'zod';
-import { BaseSchema } from './base.dto';
+import { NamedSchema } from './base.dto';
 
-export const CategorySchema = BaseSchema.extend({
+export const CategorySchema = NamedSchema.extend({
   type: z.literal("category"),
 });
 

@@ -1,7 +1,7 @@
 import z from 'zod';
-import { BaseSchema } from './base.dto';
+import { NamedSchema } from './base.dto';
 
-export const PersonSchema = BaseSchema.extend({
+export const PersonSchema = NamedSchema.extend({
   type: z.literal("person"),
 });
 

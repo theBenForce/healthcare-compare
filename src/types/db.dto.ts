@@ -4,7 +4,8 @@ import { PlanSchema } from './plan.dto';
 import { PersonSchema } from './person.dto';
 import { CategorySchema } from './category.dto';
 import { ExpenseSchema } from './expense.dto';
-import { BaseSchema, TableNames } from './base.dto';
+import { NamedSchema, TableNames } from './base.dto';
+import { Logger } from '../util/logger';
 
 
 export const AllDbTypes = z.discriminatedUnion("type", [
@@ -17,9 +18,9 @@ export const AllDbTypes = z.discriminatedUnion("type", [
 
 export type AllDbTypes = z.infer<typeof AllDbTypes>;
 
-export function isBaseEntity(data: unknown): data is BaseSchema {
+export function isBaseEntity(data: unknown): data is NamedSchema {
   try {
-    BaseSchema.parse(data);
+    NamedSchema.parse(data);
     return true;
   } catch {
     return false;
@@ -53,14 +54,14 @@ export const BackupSchema = z.union([BackupV2Schema, BackupV1Schema]);
 export type BackupSchema = z.infer<typeof BackupSchema>;
 
 export const convertBackupToLatest = (backup: BackupSchema): BackupLatestSchema => {
-  console.info(`Converting backup to latest version`);
+  Logger.info(`Converting backup to latest version`);
 
   const result = BackupLatestSchema.parse({});
 
   if ('version' in backup) {
     result.tables = backup.tables;
   } else {
-    console.info(`Legacy backup detected, converting to latest version`);
+    Logger.info(`Legacy backup detected, converting to latest version`);
     for (const [tableName, tableValues] of Object.entries(backup)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

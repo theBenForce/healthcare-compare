@@ -13,6 +13,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
+import { Logger } from '../../util/logger';
 
 
 interface EditExpenseDialogProps {
@@ -40,13 +41,13 @@ export const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({ expenseId,
   </Dialog>;
 
   const onSave = async () => {
-    console.info(`Saving expense`, expense);
+    Logger.info(`Saving expense`, expense);
     await save(expense);
     onClose();
   };
 
   const onMonthsChanged = (months: number[]) => {
-    console.info(`Months changed`, months);
+    Logger.info(`Months changed`, months);
     setExpense(expense => ({ ...expense!, months }));
   };
 

@@ -7,8 +7,7 @@ export type TableNames = z.infer<typeof TableNames>;
 
 export const BaseSchema = z.object({
   id: z.string().ulid().default(() => ulid()),
-  name: z.string().min(3).max(255).default('Unnamed'),
-  description: z.string().min(3).max(255).optional(),
+  isDeleted: z.boolean().optional(),
   type: TableNames,
   updatedAt: z.date().or(z.string({ coerce: true }).datetime()).optional().default(() => new Date().toISOString()).transform(value => {
     if (typeof value !== 'string') return value.toISOString();
@@ -16,4 +15,11 @@ export const BaseSchema = z.object({
 }).passthrough();
 
 export type BaseSchema = z.infer<typeof BaseSchema>;
+
+export const NamedSchema = BaseSchema.extend({
+  name: z.string().min(3).max(255).default('Unnamed'),
+  description: z.string().min(3).max(255).optional(),
+}).passthrough();
+
+export type NamedSchema = z.infer<typeof NamedSchema>;
 

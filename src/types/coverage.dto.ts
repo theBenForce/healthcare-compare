@@ -1,5 +1,6 @@
 import { ulid } from 'ulidx';
 import z from 'zod';
+import { BaseSchema } from './base.dto';
 
 export const CoverageType = z.union([
   z.literal('copay'),
@@ -15,14 +16,14 @@ export const CoverageValue = z.object({
 
 export type CoverageValue = z.infer<typeof CoverageValue>;
 
-export const CoverageSchema = z.object({
+export const CoverageSchema = BaseSchema.extend({
   id: z.string().default(() => ulid()),
   planId: z.string().ulid().or(z.null()).default(null),
   categoryId: z.string().ulid().or(z.null()).default(null),
   isInNetwork: z.boolean().optional(),
   beforeDeductible: CoverageValue.default(CoverageValue.parse({})),
   afterDeductible: CoverageValue.default(CoverageValue.parse({})),
-  type: z.literal('coverage').default('coverage'),
+  type: z.literal('coverage'),
 });
 
 export type CoverageSchema = z.infer<typeof CoverageSchema>;

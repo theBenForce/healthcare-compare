@@ -5,6 +5,7 @@ import { useDB } from './db';
 import Axios from 'axios';
 import { useAppContext } from './state';
 import { BackupSchema, BackupV1Schema, BackupV2Schema } from '../types/db.dto';
+import { Logger } from '../util/logger';
 
 interface CloudSyncContextInterface {
   sync: () => void;
@@ -42,12 +43,12 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
   }, [authToken?.access_token]);
 
   const sync = React.useCallback(() => {
-    console.info(`Syncing...`);
+    Logger.info(`Syncing...`);
     if (!authToken) return;
     setIsSyncing(true);
 
     const handler = async () => {
-      console.info(`Using token ${authToken}`);
+      Logger.info(`Using token ${authToken}`);
 
       const existingFiles = await drive.get('/files', {
         params: {
@@ -55,7 +56,7 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
         }
       });
 
-      console.info(`Found ${existingFiles.data.files?.length} files`);
+      Logger.info(`Found ${existingFiles.data.files?.length} files`);
 
       const existingFile = existingFiles.data.files?.find((x: any) => x.name === BACKUP_FILENAME);
 
@@ -68,36 +69,36 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
           },
         });
 
-        console.info(`Parsing data ${JSON.stringify(fileContent.data, null, 2)}`)
+        Logger.info(`Parsing data ${JSON.stringify(fileContent.data, null, 2)}`)
 
         if ('version' in fileContent.data) {
-          console.info(`Found backup version ${fileContent.data.version}`);
+          Logger.info(`Found backup version ${fileContent.data.version}`);
           existingBackup = BackupV2Schema.parse(fileContent.data);
         } else {
-          console.info(`Found legacy backup`);
+          Logger.info(`Found legacy backup`);
           existingBackup = BackupV1Schema.parse(fileContent.data);
         }
 
-        console.info(`Existing backup loaded`);
-        console.dir(existingBackup);
+        Logger.info(`Existing backup loaded`);
+        Logger.dir(existingBackup);
       }
 
 
       const backup = await mergeStates(existingBackup);
-      console.info(`Backup created`);
-      console.dir(backup);
+      Logger.info(`Backup created`);
+      Logger.dir(backup);
 
       const backupBlob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
 
       let result = null;
 
       if (existingFile) {
-        console.info(`Deleting existing file ${existingFile.id}`);
+        Logger.info(`Deleting existing file ${existingFile.id}`);
 
         await drive.delete(`/files/${existingFile.id}`);
       }
 
-      console.info(`Creating new file`);
+      Logger.info(`Creating new file`);
       const metadata = {
         'name': BACKUP_FILENAME, // Filename at Google Drive
         'mimeType': 'application/json', // mimeType at Google Drive
@@ -121,9 +122,9 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
     handler().then((result) => {
 
       setIsModified(false);
-      console.info(`Sync complete`);
+      Logger.info(`Sync complete`);
 
-      console.dir({ result });
+      Logger.dir({ result });
     }).finally(() => {
       setIsSyncing(false);
     });

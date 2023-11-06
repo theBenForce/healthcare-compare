@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React from 'react';
 import { useDB } from '../providers/db';
-import { BaseSchema, TableNames } from '../types/base.dto';
+import { NamedSchema, TableNames } from '../types/base.dto';
 import { CoverageSchema } from '../types/coverage.dto';
 import { useAppContext } from '../providers/state';
 import { AllDbTypes } from '../types/db.dto';
+import { Logger } from '../util/logger';
 
 type RecordFilter = Record<string, string | undefined>;
 
@@ -26,32 +28,48 @@ export const useTable = <TableSchema extends AllDbTypes>({ tableName, filter }: 
   const [baseFilter] = React.useState<RecordFilter | null>(filter ?? null);
   const { setIsModified } = useAppContext();
 
+  const setType = React.useCallback((value: TableSchema) => {
+    if (tableName === 'expense') {
+      value = {
+        ...value,
+        // @ts-ignore
+        months: (value.months ?? []).filter(month => month < 12).reduce((acc, month) => {
+          if (!acc.includes(month)) acc.push(month);
+          return acc;
+        }, [])
+      }
+    }
+    return AllDbTypes.parse({ ...value, type: tableName }) as TableSchema;
+  }, [tableName]);
+
   const list = React.useCallback(async (filterOverride?: RecordFilter): Promise<Array<TableSchema>> => {
-    console.info(`Listing ${tableName}`);
+    Logger.info(`Listing ${tableName}`);
     
     let result: TableSchema[] | undefined = undefined;
     if (db) {
-      console.info(`Listing ${tableName} from db`);
+      Logger.info(`Listing ${tableName} from db`);
       filterOverride = filterOverride ?? baseFilter ?? undefined;
       if (filterOverride) {
         const filterEntries = Object.entries(filterOverride).filter(([, value]) => value);
 
         if (filterEntries.length > 0) {
-          console.info(`Listing ${tableName} from db with filter ${JSON.stringify(filterEntries[0])}`);
+          Logger.info(`Listing ${tableName} from db with filter ${JSON.stringify(filterEntries[0])}`);
           const [index, value] = filterEntries[0];
           result = await db.getAllFromIndex(tableName, index, value);
         }
       }
     
       if (!result) {
-        console.info(`Listing ${tableName} from db without filter`);
-        result = await db?.getAll(tableName).then((values) => values.map(v => ({ ...v, type: tableName })) || []);
+        Logger.info(`Listing ${tableName} from db without filter`);
+        result = await db?.getAll(tableName).then((values) => values.map(setType) || []);
       }
     }
+
+    const allRecords = (result ?? []).filter(x => !x.isDeleted);
     
-    setValues(result ?? []);
-    return (result ?? []).map(record => AllDbTypes.parse(record) as TableSchema);
-  }, [db, tableName, baseFilter]);
+    setValues(allRecords);
+    return (result ?? []).map(setType);
+  }, [tableName, db, baseFilter, setType]);
 
   const remove = React.useCallback(async (id: string) => {
     await db?.delete(tableName, id);
@@ -60,7 +78,7 @@ export const useTable = <TableSchema extends AllDbTypes>({ tableName, filter }: 
   }, [db, tableName, values, setIsModified]);
 
   const get = React.useCallback(async (id: string): Promise<TableSchema | null> => {
-    console.info(`get ${tableName} ${id}`);
+    Logger.info(`get ${tableName} ${id}`);
     const result = await db?.get(tableName, id)?.then((value) => AllDbTypes.parse({ ...value, type: tableName }) as TableSchema);
     
     return result ?? null;
@@ -91,7 +109,7 @@ export const useTable = <TableSchema extends AllDbTypes>({ tableName, filter }: 
 
   React.useEffect(() => {
     if(!tableName) return;
-    console.info(`Initial listing ${JSON.stringify({tableName, filter: baseFilter})}`);
+    Logger.info(`Initial listing ${JSON.stringify({tableName, filter: baseFilter})}`);
     list();
   }, [list, tableName, baseFilter]);
 

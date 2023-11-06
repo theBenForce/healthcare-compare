@@ -4,6 +4,7 @@ import merge from 'lodash.merge';
 import React from 'react';
 import { TableNames } from '../types/base.dto';
 import { BackupLatestSchema, BackupSchema, convertBackupToLatest } from '../types/db.dto';
+import { Logger } from '../util/logger';
 
 
 interface DBContextInterface {
@@ -24,10 +25,10 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
   const [db, setDB] = React.useState<IDBPDatabase | null>(null);
 
   React.useEffect(() => {
-    console.info(`Initializing DB`);
+    Logger.info(`Initializing DB`);
     openDB('healthcare-compare', 3, {
       async upgrade(database, oldVersion, _newVersion, transaction) {
-        console.info(`Upgrading DB`)
+        Logger.info(`Upgrading DB`)
         for (const tableName of Object.values(TableNames)) {
           if (!database.objectStoreNames.contains(tableName)) {
             const table = database.createObjectStore(tableName, { keyPath: 'id' });
@@ -59,7 +60,7 @@ export const WithDB = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const createBackup = React.useCallback(async () => {
-    console.info(`Creating backup`);
+    Logger.info(`Creating backup`);
     const storeNames = Object.values(TableNames.enum);
     const backup = BackupLatestSchema.parse({});
 

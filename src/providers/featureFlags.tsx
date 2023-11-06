@@ -1,4 +1,5 @@
 import React from 'react';
+import { Logger } from '../util/logger';
 
 export enum FeatureFlags {
   CLOUD_SYNC = 'CLOUD_SYNC',
@@ -36,8 +37,8 @@ export const WithFeatureFlags: React.FC<React.PropsWithChildren> = ({ children }
 
   React.useEffect(() => {
     if (!Object.keys(flags).length) return;
-    console.info(`Saving feature flags`);
-    console.dir(flags);
+    Logger.info(`Saving feature flags`);
+    Logger.dir(flags);
     localStorage.setItem('featureFlags', JSON.stringify(flags));
   }, [flags]);
 

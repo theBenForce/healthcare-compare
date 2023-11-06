@@ -19,7 +19,7 @@ export const useCoverages = ({planId, categoryId}: UseCoveragesParams) => {
   
   React.useEffect(() => {
     const handler = async () => {
-      console.info(`Refreshing coverages for planId: ${planId} and categoryId: ${categoryId}`);
+      Logger.info(`Refreshing coverages for planId: ${planId} and categoryId: ${categoryId}`);
 
       const result = [...savedCoverages];
       if (planId) {
