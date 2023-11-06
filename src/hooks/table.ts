@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React from 'react';
 import { useDB } from '../providers/db';
-import { NamedSchema, TableNames } from '../types/base.dto';
-import { CoverageSchema } from '../types/coverage.dto';
 import { useAppContext } from '../providers/state';
+import { TableNames } from '../types/base.dto';
 import { AllDbTypes } from '../types/db.dto';
 import { Logger } from '../util/logger';
 
 type RecordFilter = Record<string, string | undefined>;
 
-export interface TableContextInterface<SchemaType extends BaseSchema | CoverageSchema> {
+export interface TableContextInterface<SchemaType extends AllDbTypes> {
   list: (filter?: RecordFilter) => Promise<SchemaType[]>;
   get: (id: string) => Promise<SchemaType | null>;
   save: (value: SchemaType) => Promise<void>;
