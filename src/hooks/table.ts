@@ -47,20 +47,20 @@ export const useTable = <TableSchema extends AllDbTypes>({ tableName, filter }: 
     
     let result: TableSchema[] | undefined = undefined;
     if (db) {
-      Logger.info(`Listing ${tableName} from db`);
+      Logger.verbose(`Listing ${tableName} from db`);
       filterOverride = filterOverride ?? baseFilter ?? undefined;
       if (filterOverride) {
         const filterEntries = Object.entries(filterOverride).filter(([, value]) => value);
 
         if (filterEntries.length > 0) {
-          Logger.info(`Listing ${tableName} from db with filter ${JSON.stringify(filterEntries[0])}`);
+          Logger.verbose(`Listing ${tableName} from db with filter ${JSON.stringify(filterEntries[0])}`);
           const [index, value] = filterEntries[0];
           result = await db.getAllFromIndex(tableName, index, value);
         }
       }
     
       if (!result) {
-        Logger.info(`Listing ${tableName} from db without filter`);
+        Logger.verbose(`Listing ${tableName} from db without filter`);
         result = await db?.getAll(tableName).then((values) => values.map(setType) || []);
       }
     }

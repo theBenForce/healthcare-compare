@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { CredentialResponse, GoogleLogin, TokenResponse, googleLogout, useGoogleLogin, useGoogleOneTapLogin } from '@react-oauth/google';
-import React, { PropsWithChildren } from 'react';
+import { CredentialResponse, TokenResponse, googleLogout, useGoogleLogin, useGoogleOneTapLogin } from '@react-oauth/google';
 import Axios from 'axios';
-import { useFlag } from './featureFlags';
+import React, { PropsWithChildren } from 'react';
 import { Logger } from '../util/logger';
+import { useFlag } from './featureFlags';
 
 
 export interface UserProfile {
@@ -111,22 +111,25 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
     return result;
   }, [syncEnabled, authToken?.expires_at]);
 
-  // useGoogleOneTapLogin({
-  //   state_cookie_domain: 'localhost',
-  //   disabled: oneTapDisabled,
-  //   onSuccess(response) {
-  //     Logger.info(`Logged in with Google One Tap`)
-  //     if (response.credential) {
-  //       Logger.info(`Saving credential to local storage`);
-  //       localStorage.setItem('googleCredential', JSON.stringify(response));
-  //     }
+  useGoogleOneTapLogin({
+    state_cookie_domain: import.meta.env.MODE === 'development' ? 'localhost' : 'healthcare-compared.com',
+    disabled: oneTapDisabled,
+    onSuccess(response) {
+      Logger.info(`Logged in with Google One Tap`)
+      if (response.credential) {
+        Logger.info(`Saving credential to local storage`);
+        localStorage.setItem('googleCredential', JSON.stringify(response));
 
-  //     setCredential(response ?? null);
-  //   },
-  //   onError() {
-  //     Logger.error(`Error logging in with Google One Tap`);
-  //   },
-  // });
+        // @ts-ignore
+        Logger.info(`Google: ${JSON.stringify(window.google ?? {}, null, 2)}`);
+      }
+
+      setCredential(response ?? null);
+    },
+    onError() {
+      Logger.error(`Error logging in with Google One Tap`);
+    },
+  });
 
   React.useEffect(() => {
     if (!syncEnabled) return;
@@ -163,8 +166,5 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
     setProfile(null);
   };
 
-  return <cloudAuthContext.Provider value={{ authToken, signOut, signIn, profile }}>
-    <GoogleLogin onSuccess={response => Logger.dir(response)} onError={() => Logger.error('Login failed')} useOneTap shape='circle' />
-    {children}
-  </cloudAuthContext.Provider>;
+  return <cloudAuthContext.Provider value={{ authToken, signOut, signIn, profile }} children={children} />;
 }
