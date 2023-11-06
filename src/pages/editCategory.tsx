@@ -5,7 +5,6 @@ import { useAppContext } from '../providers/state';
 import { ExpandCircleDownRounded } from '@mui/icons-material';
 import ExpenseIcon from "@mui/icons-material/AttachMoneyRounded";
 import SaveIcon from "@mui/icons-material/SaveRounded";
-import { ulid } from 'ulidx';
 import { CoverageList } from '../components/CoverageList';
 import { useTable } from '../hooks/table';
 import { CategorySchema } from '../types/category.dto';

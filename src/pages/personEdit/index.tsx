@@ -5,7 +5,6 @@ import { PersonSchema } from '../../types/person.dto';
 
 import ExpenseIcon from "@mui/icons-material/AttachMoneyRounded";
 import SaveIcon from "@mui/icons-material/SaveRounded";
-import { ulid } from 'ulidx';
 import { useTable } from '../../hooks/table';
 import { ExpenseSchema } from '../../types/expense.dto';
 import { ExpenseList } from './expenseList';
