@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React from 'react';
 import { IDBPDatabase, openDB } from 'idb';
 import merge from 'lodash.merge';
-import { BackupLatestSchema, BackupSchema, convertBackupToLatest, isBaseEntity } from '../types/db.dto';
+import React from 'react';
 import { TableNames } from '../types/base.dto';
+import { BackupLatestSchema, BackupSchema, convertBackupToLatest } from '../types/db.dto';
 
 
 interface DBContextInterface {

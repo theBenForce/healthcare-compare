@@ -6,18 +6,18 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ulid } from 'ulidx';
 import { useTable } from '../hooks/table';
-import { TableNames } from '../providers/db';
 import { useAppContext } from '../providers/state';
-import { BaseSchema } from '../types/base.dto';
+import { TableNames } from '../types/base.dto';
 import { EntityCard } from './EntityCard';
+import { AllDbTypes } from '../types/db.dto';
 
 interface EntityListParams {
-  table: `${TableNames}`;
+  table: TableNames;
   title: string;
 }
 
 export const EntityList: React.FC<EntityListParams> = ({ table, title }) => {
-  const { values, save } = useTable<BaseSchema>({ tableName: table });
+  const { values, save } = useTable<AllDbTypes>({ tableName: table });
   const theme = useTheme();
   const navigate = useNavigate();
   const { setTitle } = useAppContext();
@@ -28,11 +28,10 @@ export const EntityList: React.FC<EntityListParams> = ({ table, title }) => {
 
   const onCreate = async () => {
     const id = ulid();
-    await save({
+    await save(AllDbTypes.parse({
       id,
-      name: `New ${table}`,
       type: table as TableNames,
-    });
+    }));
     navigate(`/${table}/${id}`);
   };
 

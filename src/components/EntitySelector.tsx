@@ -7,7 +7,7 @@ import type { SxProps } from '@mui/material';
 import { AllDbTypes, isBaseEntity } from '../types/db.dto';
 
 interface EntitySelectorParams {
-  value: string;
+  value: string | null;
   onChange: (value: string | null) => void;
   table: TableNames;
   label: string;

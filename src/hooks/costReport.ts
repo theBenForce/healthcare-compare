@@ -37,7 +37,7 @@ export const useCostReport = (): CostReport => {
 
         monthlyExpenses.flat(1).forEach((expense) => {
           const coverage = coverages.find(c => c.categoryId === expense.categoryId);
-          if (!coverage) return;
+          if (!coverage || !expense.personId ) return;
 
           const pastIndividualDeductible = (coverage.isInNetwork || plan.isCombinedDeductible) ? individualInNetworkCharges[expense.personId] >= plan.inNetworkLimt.deductible : individualOutOfNetworkCharges[expense.personId] >= plan.outOfNetworkLimit.deductible;
           const pastFamilyDeductible = (coverage.isInNetwork || plan.isCombinedDeductible) ? inNetworkCharges >= plan.inNetworkLimt.deductible : outOfNetworkCharges >= plan.outOfNetworkLimit.deductible;
@@ -64,7 +64,7 @@ export const useCostReport = (): CostReport => {
             }
 
             inNetworkCharges += amount;
-            individualInNetworkCharges[expense.personId] += amount;
+            individualInNetworkCharges[expense.personId!] += amount;
           } else {
             if(individualOutOfNetworkCharges[expense.personId] + amount > plan.outOfNetworkLimit.outOfPocketMax) {
               amount = plan.outOfNetworkLimit.outOfPocketMax - individualOutOfNetworkCharges[expense.personId];
