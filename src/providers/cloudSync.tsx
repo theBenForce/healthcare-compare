@@ -4,7 +4,7 @@ import { useCloudAuth } from './cloudAuth';
 import { useDB } from './db';
 import Axios from 'axios';
 import { useAppContext } from './state';
-import { BackupSchema, BackupV1Schema } from '../types/db.dto';
+import { BackupSchema, BackupV1Schema, BackupV2Schema } from '../types/db.dto';
 
 interface CloudSyncContextInterface {
   sync: () => void;
@@ -72,7 +72,7 @@ export const WithCloudSync: React.FC<React.PropsWithChildren> = ({ children }) =
 
         if ('version' in fileContent.data) {
           console.info(`Found backup version ${fileContent.data.version}`);
-          existingBackup = BackupSchema.parse(fileContent.data.data);
+          existingBackup = BackupV2Schema.parse(fileContent.data);
         } else {
           console.info(`Found legacy backup`);
           existingBackup = BackupV1Schema.parse(fileContent.data);

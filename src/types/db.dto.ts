@@ -7,7 +7,7 @@ import { ExpenseSchema } from './expense.dto';
 import { BaseSchema, TableNames } from './base.dto';
 
 
-export const AllDbTypes = z.union([
+export const AllDbTypes = z.discriminatedUnion("type", [
   CoverageSchema,
   PlanSchema,
   PersonSchema,
@@ -37,9 +37,9 @@ export const BackupV2Schema = z.object({
   version: z.literal(2, {required_error: 'Backup version is required'}).default(2),
   tables: z.record(
     TableNames,
-    z.record(z.string().ulid(), z.array(AllDbTypes)),
+    z.record(z.string().ulid(), AllDbTypes),
     { required_error: 'Backup tables are required' }
-  ).default(() => ({})),
+  ).default({}),
 });
 
 export type BackupV2Schema = z.infer<typeof BackupV2Schema>;
@@ -48,7 +48,7 @@ export const BackupLatestSchema = BackupV2Schema;
 
 export type BackupLatestSchema = z.infer<typeof BackupLatestSchema>;
 
-export const BackupSchema = z.union([BackupV1Schema, BackupV2Schema]);
+export const BackupSchema = z.union([BackupV2Schema, BackupV1Schema]);
 
 export type BackupSchema = z.infer<typeof BackupSchema>;
 

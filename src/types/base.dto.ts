@@ -10,7 +10,10 @@ export const BaseSchema = z.object({
   name: z.string().min(3).max(255).default('Unnamed'),
   description: z.string().min(3).max(255).optional(),
   type: TableNames,
-  updatedAt: z.date().optional().default(() => new Date()),
+  updatedAt: z.date().or(z.string({ coerce: true }).datetime()).optional().default(() => new Date().toISOString()).transform(value => {
+    if (typeof value !== 'string') return value.toISOString();
+  }),
 }).passthrough();
 
 export type BaseSchema = z.infer<typeof BaseSchema>;
+
