@@ -12,6 +12,8 @@ export const DeletedEntry = BaseSchema.extend({
   type: z.literal('deleted'),
 });
 
+export type DeletedEntry = z.infer<typeof DeletedEntry>;
+
 export const AllDbTypes = z.discriminatedUnion("type", [
   DeletedEntry,
   CoverageSchema,

@@ -3,7 +3,7 @@ import React from 'react';
 import { useDB } from '../providers/db';
 import { useAppContext } from '../providers/state';
 import { TableNames } from '../types/base.dto';
-import { AllDbTypes } from '../types/db.dto';
+import { AllDbTypes, DeletedEntry } from '../types/db.dto';
 import { Logger } from '../util/logger';
 
 type RecordFilter = Record<string, string | undefined>;
@@ -71,7 +71,7 @@ export const useTable = <TableSchema extends AllDbTypes>({ tableName, filter }: 
   }, [tableName, db, baseFilter, setType]);
 
   const remove = React.useCallback(async (id: string) => {
-    await db?.delete(tableName, id);
+    await db?.put(tableName, DeletedEntry.parse({ id, type: 'deleted' }));
     setValues(values.filter(v => v.id !== id));
     setIsModified(true);
   }, [db, tableName, values, setIsModified]);
