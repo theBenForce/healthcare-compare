@@ -59,6 +59,9 @@ dependencies:
   react-router-dom:
     specifier: ^6.17.0
     version: 6.17.0(react-dom@18.2.0)(react@18.2.0)
+  react-social-login-buttons:
+    specifier: ^3.9.1
+    version: 3.9.1(react@18.2.0)
   ulidx:
     specifier: ^2.2.1
     version: 2.2.1
@@ -2470,6 +2473,14 @@ packages:
       react: '>=16.8'
     dependencies:
       '@remix-run/router': 1.10.0
+      react: 18.2.0
+    dev: false
+
+  /react-social-login-buttons@3.9.1(react@18.2.0):
+    resolution: {integrity: sha512-KtucVWvdnIZ0icG99WJ3usQUJYmlKsOIBYGyngcuNSVyyYdZtif4KHY80qnCg+teDlgYr54ToQtg3x26ZqaS2w==}
+    peerDependencies:
+      react: ^15.0.0 || ^16.0.0 || ^17.x || ^18.x
+    dependencies:
       react: 18.2.0
     dev: false
 

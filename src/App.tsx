@@ -24,6 +24,7 @@ import EditPlanPage from './pages/editPlan';
 import EditPersonPage from './pages/personEdit';
 import SettingsPage from './pages/settings';
 import SummaryPage from './pages/summary';
+import { SyncMenu } from './components/SyncMenu';
 
 const CloudSyncStatus = React.lazy(() => import('./components/CloudSync'));
 const AccountMenu = React.lazy(() => import('./components/AccountMenu'));
@@ -49,10 +50,7 @@ function App() {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'left' }}>{title}</Typography>
-            {syncEnabled && <Stack direction='row' spacing={2}>
-              <CloudSyncStatus />
-              <AccountMenu />
-            </Stack>}
+            {syncEnabled && <SyncMenu />}
           </Toolbar>
         </AppBar>
 
