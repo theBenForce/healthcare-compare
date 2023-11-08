@@ -10,8 +10,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 
-// @ts-ignore
-import GoogleLoginButton from 'react-social-login-buttons/src/buttons/GoogleLoginButton';
+import { GoogleLoginButton } from "react-social-login-buttons";
 
 export const SyncMenu: React.FC = () => {
 

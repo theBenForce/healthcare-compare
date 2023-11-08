@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { CredentialResponse, TokenResponse, googleLogout, useGoogleLogin } from '@react-oauth/google';
+import { TokenResponse, googleLogout, useGoogleLogin } from '@react-oauth/google';
 import Axios from 'axios';
 import React, { PropsWithChildren } from 'react';
+import { AuthToken } from '../types/authToken.dto';
 import { Logger } from '../util/logger';
 import { useFlag } from './featureFlags';
-import { AuthToken, isCredentialResponse } from '../types/authToken.dto';
 
 
 export interface UserProfile {
@@ -81,18 +81,6 @@ export const WithCloudAuth: React.FC<PropsWithChildren> = ({ children }) => {
       Logger.error(`Non OAuth Error logging in with Google: ${JSON.stringify(nonOAuthError, null, 2)}`);
     },
   });
-
-  const onSignIn = React.useCallback((response: Partial<TokenResponse | CredentialResponse>) => {
-    if (isCredentialResponse(response)) {
-      loginWithGoogle({
-        hint: response.credential,
-        prompt: 'none',
-      });
-      return;
-    } else {
-      onTokenResponse(response as TokenResponse);
-    }
-  }, [loginWithGoogle]);
 
   React.useEffect(() => {
     if (!loginWithGoogle || !authToken) return;

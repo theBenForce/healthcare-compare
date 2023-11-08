@@ -16,7 +16,6 @@ import {
 
 import { useAppContext } from './providers/state';
 import { useFlag } from './providers/featureFlags';
-import Stack from '@mui/material/Stack';
 
 import EntityList from './components/EntityList';
 import EditCategoryPage from './pages/editCategory';
@@ -25,9 +24,6 @@ import EditPersonPage from './pages/personEdit';
 import SettingsPage from './pages/settings';
 import SummaryPage from './pages/summary';
 import { SyncMenu } from './components/SyncMenu';
-
-const CloudSyncStatus = React.lazy(() => import('./components/CloudSync'));
-const AccountMenu = React.lazy(() => import('./components/AccountMenu'));
 
 const Sidebar = React.lazy(() => import('./components/Sidebar'));
 
