@@ -8,7 +8,7 @@ import { BaseSchema, NamedSchema, TableNames } from './base.dto';
 import { Logger } from '../util/logger';
 
 export const DeletedEntry = BaseSchema.extend({
-  isDeleted: z.literal(true),
+  isDeleted: z.literal(true).default(true),
   type: z.literal('deleted'),
 });
 

@@ -38,7 +38,7 @@ export const useTable = <TableSchema extends AllDbTypes>({ tableName, filter }: 
         }, [])
       }
     }
-    return AllDbTypes.parse({ ...value, type: tableName }) as TableSchema;
+    return AllDbTypes.parse({ ...value, type: value.type ?? tableName }) as TableSchema;
   }, [tableName]);
 
   const list = React.useCallback(async (filterOverride?: RecordFilter): Promise<Array<TableSchema>> => {
@@ -71,10 +71,13 @@ export const useTable = <TableSchema extends AllDbTypes>({ tableName, filter }: 
   }, [tableName, db, baseFilter, setType]);
 
   const remove = React.useCallback(async (id: string) => {
+    if (!db) return;
+
+    Logger.info(`remove ${tableName} ${id}`);
     await db?.put(tableName, DeletedEntry.parse({ id, type: 'deleted' }));
-    setValues(values.filter(v => v.id !== id));
+    setValues(values => values.filter(v => v.id !== id));
     setIsModified(true);
-  }, [db, tableName, values, setIsModified]);
+  }, [db, tableName, setIsModified]);
 
   const get = React.useCallback(async (id: string): Promise<TableSchema | null> => {
     Logger.info(`get ${tableName} ${id}`);
