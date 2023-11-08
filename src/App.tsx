@@ -16,7 +16,6 @@ import {
 
 import { useAppContext } from './providers/state';
 import { useFlag } from './providers/featureFlags';
-import Stack from '@mui/material/Stack';
 
 import EntityList from './components/EntityList';
 import EditCategoryPage from './pages/editCategory';
@@ -24,9 +23,7 @@ import EditPlanPage from './pages/editPlan';
 import EditPersonPage from './pages/personEdit';
 import SettingsPage from './pages/settings';
 import SummaryPage from './pages/summary';
-
-const CloudSyncStatus = React.lazy(() => import('./components/CloudSync'));
-const AccountMenu = React.lazy(() => import('./components/AccountMenu'));
+import { SyncMenu } from './components/SyncMenu';
 
 const Sidebar = React.lazy(() => import('./components/Sidebar'));
 
@@ -49,10 +46,7 @@ function App() {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'left' }}>{title}</Typography>
-            {syncEnabled && <Stack direction='row' spacing={2}>
-              <CloudSyncStatus />
-              <AccountMenu />
-            </Stack>}
+            {syncEnabled && <SyncMenu />}
           </Toolbar>
         </AppBar>
 
