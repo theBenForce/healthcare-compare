@@ -17,6 +17,7 @@ export const useCostReport = (): CostReport => {
     listPlans().then(async (plans) => {
       const result: CostReport = [];
       for (const plan of plans) {
+        if(plan.isDeleted) continue;
         const coverages = await listCoverages({planId: plan.id});
         const monthlyExpenses: Array<Array<ExpenseSchema>> = [];
         const people = await listPeople();
@@ -39,8 +40,8 @@ export const useCostReport = (): CostReport => {
           const coverage = coverages.find(c => c.categoryId === expense.categoryId);
           if (!coverage || !expense.personId ) return;
 
-          const pastIndividualDeductible = (coverage.isInNetwork || plan.isCombinedDeductible) ? individualInNetworkCharges[expense.personId] >= plan.inNetworkLimt.deductible : individualOutOfNetworkCharges[expense.personId] >= plan.outOfNetworkLimit.deductible;
-          const pastFamilyDeductible = (coverage.isInNetwork || plan.isCombinedDeductible) ? inNetworkCharges >= plan.inNetworkLimt.deductible : outOfNetworkCharges >= plan.outOfNetworkLimit.deductible;
+          const pastIndividualDeductible = (coverage.isInNetwork || plan.isCombinedDeductible) ? individualInNetworkCharges[expense.personId] >= plan.inNetworkLimt.deductible : individualOutOfNetworkCharges[expense.personId] >= plan.outOfNetworkLimit?.deductible;
+          const pastFamilyDeductible = (coverage.isInNetwork || plan.isCombinedDeductible) ? inNetworkCharges >= plan.inNetworkLimt.deductible : outOfNetworkCharges >= plan.outOfNetworkLimit?.deductible;
 
           const coverageValue = (pastIndividualDeductible || pastFamilyDeductible) ?
             coverage.afterDeductible : coverage.beforeDeductible;
@@ -66,11 +67,11 @@ export const useCostReport = (): CostReport => {
             inNetworkCharges += amount;
             individualInNetworkCharges[expense.personId!] += amount;
           } else {
-            if(individualOutOfNetworkCharges[expense.personId] + amount > plan.outOfNetworkLimit.outOfPocketMax) {
+            if(individualOutOfNetworkCharges[expense.personId] + amount > plan.outOfNetworkLimit?.outOfPocketMax) {
               amount = plan.outOfNetworkLimit.outOfPocketMax - individualOutOfNetworkCharges[expense.personId];
             }
 
-            const outOfPocketMax = plan.isFamilyPlan ? plan.outOfNetworkLimit.familyOutOfPocketMax : plan.outOfNetworkLimit.outOfPocketMax;
+            const outOfPocketMax = plan.isFamilyPlan ? plan.outOfNetworkLimit.familyOutOfPocketMax : plan.outOfNetworkLimit?.outOfPocketMax;
             if (outOfNetworkCharges + amount > outOfPocketMax) {
               amount = plan.outOfNetworkLimit.outOfPocketMax - outOfNetworkCharges;
             }

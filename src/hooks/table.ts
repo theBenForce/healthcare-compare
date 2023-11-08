@@ -3,7 +3,7 @@ import React from 'react';
 import { useDB } from '../providers/db';
 import { useAppContext } from '../providers/state';
 import { TableNames } from '../types/base.dto';
-import { AllDbTypes } from '../types/db.dto';
+import { AllDbTypes, DeletedEntry } from '../types/db.dto';
 import { Logger } from '../util/logger';
 
 type RecordFilter = Record<string, string | undefined>;
@@ -38,7 +38,7 @@ export const useTable = <TableSchema extends AllDbTypes>({ tableName, filter }: 
         }, [])
       }
     }
-    return AllDbTypes.parse({ ...value, type: tableName }) as TableSchema;
+    return AllDbTypes.parse({ ...value, type: value.type ?? tableName }) as TableSchema;
   }, [tableName]);
 
   const list = React.useCallback(async (filterOverride?: RecordFilter): Promise<Array<TableSchema>> => {
@@ -71,10 +71,13 @@ export const useTable = <TableSchema extends AllDbTypes>({ tableName, filter }: 
   }, [tableName, db, baseFilter, setType]);
 
   const remove = React.useCallback(async (id: string) => {
-    await db?.delete(tableName, id);
-    setValues(values.filter(v => v.id !== id));
+    if (!db) return;
+
+    Logger.info(`remove ${tableName} ${id}`);
+    await db?.put(tableName, DeletedEntry.parse({ id, type: 'deleted' }));
+    setValues(values => values.filter(v => v.id !== id));
     setIsModified(true);
-  }, [db, tableName, values, setIsModified]);
+  }, [db, tableName, setIsModified]);
 
   const get = React.useCallback(async (id: string): Promise<TableSchema | null> => {
     Logger.info(`get ${tableName} ${id}`);

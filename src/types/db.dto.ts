@@ -4,11 +4,18 @@ import { PlanSchema } from './plan.dto';
 import { PersonSchema } from './person.dto';
 import { CategorySchema } from './category.dto';
 import { ExpenseSchema } from './expense.dto';
-import { NamedSchema, TableNames } from './base.dto';
+import { BaseSchema, NamedSchema, TableNames } from './base.dto';
 import { Logger } from '../util/logger';
 
+export const DeletedEntry = BaseSchema.extend({
+  isDeleted: z.literal(true).default(true),
+  type: z.literal('deleted'),
+});
+
+export type DeletedEntry = z.infer<typeof DeletedEntry>;
 
 export const AllDbTypes = z.discriminatedUnion("type", [
+  DeletedEntry,
   CoverageSchema,
   PlanSchema,
   PersonSchema,

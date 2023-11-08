@@ -8,7 +8,7 @@ export type TableNames = z.infer<typeof TableNames>;
 export const BaseSchema = z.object({
   id: z.string().ulid().default(() => ulid()),
   isDeleted: z.boolean().optional(),
-  type: TableNames,
+  type: TableNames.or(z.literal('deleted')),
   updatedAt: z.date().or(z.string({ coerce: true }).datetime()).optional().default(() => new Date().toISOString()).transform(value => {
     if (typeof value !== 'string') return value.toISOString();
   }),
