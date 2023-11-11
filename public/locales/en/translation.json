@@ -3,7 +3,7 @@
     "title": "Healthcare Compared",
     "about": {
       "title": "About",
-      "content": "Healthcare Compared was built to be a simple way of comparing insurance plans each year. To get started, click on the hamburger icon then click plans."
+      "content": "Healthcare Compared was built to be a simple way of comparing insurance plans each year. To get started, click on the menu icon then click plans."
     },
     "disclaimer": {
       "title": "Disclaimer",
@@ -13,5 +13,6 @@
   "editCategory": {
     "title": "Edit Category"
   },
-  "loading": "Loading"
+  "loading": "Loading",
+  "buyMeACoffee": "Buy me a coffee"
 }
