@@ -33,7 +33,7 @@ function App() {
   const syncEnabled = useFlag('CLOUD_SYNC');
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
       <Router>
         <AppBar position="sticky">
           <Toolbar>
